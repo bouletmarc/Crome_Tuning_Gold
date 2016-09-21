@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body,td,th {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #FFFFFF;
+}
+body {
+	background-color: #000000;
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+}
+-->
+</style>
+<link href="master.css" rel="stylesheet" type="text/css">
+<script language="javascript">
+<!--
+function canGoNext() {
+  return true;
+}
+//-->
+</script>
+</head>
+
+<body scroll="no">
+Thank you for using <em><strong>ADVANCED BOOST Tools+</strong></em>. This CROME plugin allows you too add, edit, and customize boost options to P30, and P72 related ROMS. This plugin also includes <em><strong>Final Value Fuel Tools</strong></em>, and <em><strong>Load Based Closed Loop Disable</strong></em> plugins. The <em><strong>'FV Fuel Tools'</strong></em> plugin is an advanced fuel control plugin to help compensate for necessary fuel changes that usually happen when adding boost and larger injectors. 	With FV Fuel Tools, all multipliers are relative to your final multiplier - if you want your O2, Postfuel, TPS multipliers to be the same as your overall multiplier, make sure they are set to 1.0!!!  The <em><strong>'Load Based Closed Loop Disable'</strong></em> plugin disables closed loop above a user defined load point.<br>
+<br>
+<script src="booster.js"></script>
+<script>
+if (window.external.rom.hasBoost == 0)
+	document.write("<span class=\"errorMsg\">&lt; ! &gt; This ROM currently does not support boost. Continuing with this wizard will allow you to add boost support for this ROM. Please click 'Next' to continue. &lt; ! &gt;</span>");
+else {
+    if (parent.hasAdvBoostToolsPlus())
+	    document.write("This ROM already supports boost. Continuing with this wizard will allow you to change the map sensor type and the number of boost columns. Please click 'Next' to continue.");
+    else
+        document.write("<span class=\"errorMsg\">&lt; ! &gt; This ROM is using an older version of Boost Tools.  Continuing with this wizard will upgrade the current ROM to Advanced Boost Tools+.  Please click 'Next' to continue &lt; ! &gt;</span>");
+}
+</script><br>
+</body>
+</html>

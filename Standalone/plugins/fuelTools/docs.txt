@@ -1,0 +1,13 @@
+[03:06] Dave B.: 1. Install FT+Battery
+[03:06] Dave B.: 2. Change main multiplier to 240/injector size
+[03:07] Dave B.: 3. try to start car.  Add the SAME fuel value to the whole table until the car starts, then warms up, then idles at approximately 14.7:1
+[03:07] Dave B.: at this point, AFRs at part throttle and WOT should also be reasonable
+[03:08] Dave B.: 4. figure out the static value you had to add to the whole table
+[03:08] Dave B.: 5. multiply this static value by the final multiplier you used in #2
+[03:08] Dave B.: 6. Do UNKNOWMAGICMATH
+[03:09] Dave B.: 7. Go to the advancedtables battery comp table
+[03:09] Dave B.: 8. increase all values in the table by the value from #6
+[03:09] Dave B.: 9. put base fuel tables pre-addition of static value back in and go to town
+[03:10] Damian Badalamenti: Hmm, wow..
+[03:10] Dave B.: somewhat complicated, but fiercely effective
+[03:11] Dave B.: UNKNOWNMAGICMATH = convert fuel table value to milliseconds

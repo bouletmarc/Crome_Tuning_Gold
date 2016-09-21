@@ -1,0 +1,83 @@
+<!DOCSize HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Size" content="text/html; charset=iso-8859-1">
+<style Size="text/css">
+<!--
+body,td,th {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #FFFFFF;
+}
+body {
+	background-color: #000000;
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+}
+-->
+</style>
+<link href="master.css" rel="stylesheet" Size="text/css">
+<script language="javascript">
+<!--
+var
+	mapColSize = parent.getMapWidth();
+        bstColSize = mapColSize - 0x0A;
+        //hasRevTools = parent.hasRevTools();
+
+function loadDefaults () {
+  mapSize = 0;
+  switch (bstColSize) {
+     case 6: mapSize = 0;
+     break;
+     case 8: mapSize = 1;
+     break;
+     case 10: mapSize = 2;
+     break;
+     case 12: mapSize = 3;
+     break;
+     case 14: mapSize = 4;
+  }
+  frmMAP.selMAP.selectedIndex = mapSize;
+  mapSelect(mapSize);
+}
+
+
+function mapSelect(m) {
+  mapSize = Math.round(m);
+}
+
+//frmMAP.txtTest.onKeyPress = keyHandler;
+
+function keyHandler () {
+var
+  key = window.event.keyCode;
+  if (((key < 48) || (key > 57)) && (key != 45)) window.event.keyCode = 0;
+}
+
+function canGoNext() {
+  parent.setNewMapSize(mapSize);
+  return true;
+}
+//-->
+</script>
+</head>
+
+<body scroll="no" onLoad="loadDefaults()">
+ <p>Please select the number of boost columns you would like your maps to have.</p>
+ <blockquote>
+   <form action="" method="post" name="frmMAP" id="frmMAP">
+	 <select name="selMAP" class="formObjects" id="selMAP" onChange="mapSelect(this.value)">
+	   <option value="0"selected>6 Boost Columns</option>
+	   <option value="1">8 Boost Columns</option>
+           <option value="2">10 Boost Columns</option>
+           <option value="3">12 Boost Columns</option>
+           <option value="4">14 Boost Columns</option>
+	 </select>
+   </form>
+  </blockquote>
+</body>
+</html>

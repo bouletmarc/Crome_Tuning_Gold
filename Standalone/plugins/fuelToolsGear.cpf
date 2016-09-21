@@ -1,0 +1,656 @@
+/*
+FUEL TOOLS - Adds multipliers for various fuel trims
+
+v1.99r5 (Nate R.)
+-Created provisions for two new files that define the battery offset presets.
+ *batteryoffsetvalues.js  -- Moved function __IBOSetTableData() to this file. Define the values for offsets here.
+ *batteryoffsetvalueslist.js -- Contains the descriptions for the presets.
+ *Defined most RC injectors from 240cc - 1600cc, Common Honda, DSM, MSD, and Precision.
+ *Configured battery voltage points to be editable (Dave B.)
+
+v1.99r4 (Dave B.)
+-Added READ ONLY support for older versions of fuel tools
+
+v1.99r3 (Dave B.)
+-Fixed bug in P30 handler that broke adjustment of crank mulitplier
+
+V1.99r2 (Calvin B.)
+-Fixed p30 bugs(5)
+-Introduced full time batt comp table as Bat vs Offset
+
+V1.99r1 (Dave B.)
+-Relocated Fuel multipliers slightly to avoid conflicts with ABT+ P30
+
+V1.98 (Dave B.)
+-Ported code from P72 to P30
+
+V1.97 (Dave B. / Damian B.)
+-P72 now has gear correction
+
+V1.95 (Dave B.)
+-Removed full time battery offset P72
+-All battery offset usage (144h) per stock code P72
+-Added provision for second battery offset table to be used fulltime P72
+-Added second battery table to advanced tables pluging P72
+-Reverted to "old" style TPS code with hook P72
+-Use 14F0 "Final value" cranking hook per Calvin P72
+-Updated handler, etc.
+
+v1.93 (Damian B. / Dave B.)
+-P72 stuff fixed per Damian
+-incorrect padding of code by Damian fixed by Dave
+
+v1.9 (Dave B.)
+-Ported 1.8 style code to P72
+-Modified handler routine
+-Renamed subroutines
+-Adds "FV+Battery" instead of FT2 to be more descriptive
+
+v1.8 (John Cui)
+-Removed cranking fuel multiplier P30
+-Added injector battery compensation to main fuel multiplier P30
+-Removed injector battery compensation from stock TPS, Cranking code to avoid duplication P30
+-added advanced table plugin for editing of battery voltage table P30
+
+V1.7 (Black R)
+-fixed another bug in P72 code (stock code in the jump area wasnt being reused in the new routine)
+
+V1.6 (Dave B.)
+-fixed horrible bug in P72 Final Mult code that would cause things to break horribly - i.e. car die immediately
+
+V1.5 (Dave B.)
+-fixed a bug causing "FV" to be appended to non-final value ROMs
+
+V1.4 (Dave B.)
+-Adds a final multiplier immediately before injectors are fired
+-Code will safely remove the "main fuel" adjuster previously used and restore the code to stock
+-Handler is backwards compatible with older ROMs
+*/
+
+var __FUEL_TOOLS__ = true;
+
+// P72 Specific Code ///////////////////////////////////////////////////////////
+function __addFVBFuelToolsToP72() {
+  // Add fuel controllers
+  //// Word Scalar
+  _rom_write(0x6761,
+             new Array(0x90,0x35,0x33,0x35,0x33,0xCD,0x03,0x67,
+                       0xFF,0xFF,0x01),
+             0x0B);
+
+  //// Final Value Fuel Control
+  //hook
+    rom.byteAt(0x05C9) = 0x03;
+    rom.wordAt(0x05CA) = 0x676C;
+    rom.byteAt(0x05CC) = 0x00;
+
+  //multiplier with battery voltage provision and gear correction
+    _rom_write(0x676C,
+               new Array(0x44,0x98,0x00,0x80,0x31,0xEF,0x44,0x10,
+			0xE5,0x06,0xE4,0x4F,0x53,0xF8,0xB5,0x06,
+			0xA9,0x96,0x67,0x44,0x10,0x31,0xDE,0x86,
+			0x00,0x00,0xCA,0x04,0x00,0x00,0xCD,0x03,
+			0x67,0xFF,0xFF,0xD4,0x9E,0xF4,0x3C,0x03,
+			0xCD,0x05,0x00,0x80,0x00,0x80,0x00,0x80,
+			0x00,0x80,0x00,0x80),
+               		52);
+
+  //Full time injector battery offset table - zeroes for now
+  _rom_write(0x56CE,
+		new Array(0xFF,0x00,0x00,0xA7,0x00,0x00,0x93,0x00,0x00,0x7E,
+			0x00,0x00,0x69,0x00,0x00,0x54,0x00,0x00,0x00,0x00,0x00),
+		21);
+
+  //// Un-do Main Fuel Control version 1 to stock code
+  //  rom.byteAt(0x129D) = 0x03;
+  //  rom.wordAt(0x129E) = 0x676C;
+  //  rom.byteAt(0x12A0) = 0xFF;
+  rom.byteAt(0x129D) = 0xD4;
+  rom.byteAt(0x129E) = 0x40;
+  rom.byteAt(0x129F) = 0xF4;
+  rom.byteAt(0x12A0) = 0x80;
+
+
+  //// O2 Fuel Control
+  //hook
+  rom.byteAt(0x1C68) = 0x03;
+  rom.wordAt(0x1C69) = 0x67A0;
+  rom.wordAt(0x1C6B) = 0x0000;
+
+  //o2 multiplier code
+  _rom_write(0x67A0,
+             new Array(0x45,0x4B,0x44,0x98,0x00,0x80,0x31,0xB9,
+		0x47,0x49,0xEA,0x2D,0x03,0x03,0xB2,0x1C,
+		0x03,0xBC,0x1C),
+             19);
+
+
+  //// Post Startup Fuel Control
+  //hook
+  rom.byteAt(0x1580) = 0x03;
+  rom.wordAt(0x1581) = 0x67B3;
+  rom.wordAt(0x1583) = 0x0000;
+
+  //post startup code
+    _rom_write(0x67B3,
+             new Array(0x44,0x98,0x00,0x80,0x31,0xA8,0xD4,0x70,
+		0xC4,0x6F,0x15,0x03,0x85,0x15),
+             14);
+  
+
+  //// Throttle Tip-in Fuel Control
+  //hook
+  rom.byteAt(0x20FA) = 0x03;
+  rom.wordAt(0x20FB) = 0x67C1;
+  rom.wordAt(0x20FD) = 0x0000;
+
+  //tps multiplier code
+  _rom_write(0x67C1,
+             new Array(0xE4,0x42,0x44,0x98,0x00,0x80,0x31,0x98,
+		0x44,0x98,0x00,0x80,0x31,0x92,0xDB,0x2B,0x03,
+		0x03,0xFF,0x20,0x03,0x0B,0x21),
+             23);
+
+
+  //// Crank Fuel Control
+  //hook
+  rom.byteAt(0x14F0) = 0x03;
+  rom.wordAt(0x14F1) = 0x67D8;
+
+  //Cranking multiplier code
+  _rom_write(0x67D8,
+		new Array(0xE0,0xBA,0x03,0x44,0x98,0x00,0x80,0x32,
+			0x61,0x67,0x03,0xF3,0x14),
+		13);
+
+  // Call Handler
+  __FVBfuelToolsHandler();
+
+}
+
+// P30 Specific Code ///////////////////////////////////////////////////////////
+
+/* Remove Previous Version of Fuel Tools */
+function __remFuelToolsP30() {
+  // Remove All Redirected Code
+  _rom_fill(0x78AE, 0x7903, 0xFF);
+  
+  // Rest Main Fuel Control Code
+  _rom_write(0x1276, new Array(0xD4,0x38,0xF4,0x70), 0x04);
+  // Reset O2 Fuel Control Code
+  _rom_write(0x1BA4, new Array(0xEA,0x25,0x58,0xCB,0x4C), 0x05);
+  // Reset Cranking Fuel Control Code
+  _rom_write(0x140E, new Array(0x87,0x3C,0xCD,0x03,0x67,0xFF,0xFF,0x03,0x81,0x76), 0x0A);
+  // Reset Throttle Tip-in Control Code
+  _rom_write(0x1EEE, new Array(0xDB,0x23,0x0C), 0x03);
+}
+
+function __addFVBFuelToolsToP30() {
+  //  Add Fuel Controllers
+  //// Word Scaler
+  _rom_write(0x6d47,
+             new Array(0x90,0x35,0x33,0x35,0x33,0xCD,0x03,0x67,
+                       0xFF,0xFF,0x01),
+             0x0B);
+
+  //// Final Fuel Control
+  rom.byteAt(0x05D0) = 0x03;
+  rom.wordAt(0x05D1) = 0x6D52;
+  rom.byteAt(0x05D3) = 0xFF;
+  _rom_write(0x6D52,
+             new Array(	0x44,0x98,0x00,0x80,0x31,0xEF,0x44,0x10,
+			0xE5,0x06,0x62,0x4F,0x02,0xE2,0x53,0xf8,
+			0xb5,0x06,0xa9,0x81,0x6d,0x44,0x10,0x31,
+			0xdc,0x86,0x00,0x00,0xca,0x07,0x62,0x07,
+			0x04,0xb2,0x82,0xCd,0x03,0x67,0xff,0xff,
+			0xd4,0xc6,0xf4,0x34,0x03,0xd4,0x05,0x00,
+			0x80,0x00,0x80,0x00,0x80,0x00,0x80,0x00,
+			0x80),
+             57);//updated 1.99r2
+
+
+  //// O2 Fuel Control
+  rom.byteAt(0x1BA4) = 0x03;
+  rom.wordAt(0x1BA5) = 0x6D8B;
+  rom.wordAt(0x1BA7) = 0xFFFF;
+  _rom_write(0x6D8B,
+             new Array(	0x45,0x4B,0x44,0x98,0x00,0x80,0x31,0xB4,
+			0x47,0x49,0xEA,0x25,0x03,0x03,0xF5,0x1B,
+			0x03,0xFF,0x1B),
+             19);//updated 1.99r2
+
+
+  //// Post Startup Fuel Control
+  rom.byteAt(0x14D4) = 0x03;
+  rom.wordAt(0x14D5) = 0x6D9E;
+  rom.wordAt(0x14D7) = 0xFFFF;
+  _rom_write(0x6D9E,
+             new Array(	0x44,0x98,0x00,0x80,0x31,0xA3,0xD4,0x60,
+			0xC4,0x5F,0x15,0x03,0xD9,0x14),
+             14);//updated 1.99r2
+
+
+  //// Throttle Tip-in Fuel Control
+  rom.byteAt(0x1EEE) = 0x03;
+  rom.wordAt(0x1EEF) = 0x6DAC;
+  _rom_write(0x6DAC,
+             new Array(	0x44,0x98,0x00,0x80,0x31,0x95,0x44,0x98,
+			0x00,0x80,0x31,0x8F,0xDB,0x23,0x03,0x03,
+			0xF1,0x1E,0x03,0xFD,0x1E),
+             21);//updated 1.99r2
+
+
+  //// Cranking Fuel Control
+  rom.byteAt(0x140E) = 0x03;
+  rom.wordAt(0x140F) = 0x6DC1;
+  _rom_write(0x1411,
+		new Array(0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF),
+		7);
+
+  _rom_write(0x6DC1,
+             new Array(	0x44,0x98,0x00,0x80,0x31,0x80,0x87,
+             		0x3C,0xCD,0x03,0x67,0xFF,0xFF,0x03,
+             		0x81,0x76),
+             16);//1.99r2
+ 
+ //// Battery Comp table lookup
+  rom.byteAt(0x414C) = 0x03;
+  rom.wordAt(0x414D) = 0x6DD1;
+  _rom_write(0x414F,
+		new Array(0xFF,0xFF,0xFF,0xFF,0xFF),
+		5);
+
+  _rom_write(0x6DD1,
+             new Array(	0xF5,0xC3,0x60,0xE6,0x6d,0x11,0x62,0x07,0x04,0xd2,
+             		0xF5,0xC3,0x60,0xD6,0x61,0x11,0xd3,0xbc,0x03,0x54,
+             		0x41,0xFF,0x00,0x00,0xa7,0x00,0x00,0x93,0x00,0x00,
+             		0x7E,0x00,0x00,0x69,0x00,0x00,0x54,0x00,0x00,0x00,
+             		0x00,0x00),
+             42);//1.99r2             
+
+
+  // Call Handler
+  __FVBfuelToolsHandler();
+}
+
+// Plugin Check ////////////////////////////////////////////////////////////////
+function __hasFVBFuelTools() {
+  switch (rom.base) {
+    case rtP28:
+      break;
+    case rtP30:
+     	return ((rom.wordAt(0x05D1) == 0x6d52) && //Final Value (hook)
+              (rom.wordAt(0x1BA5) == 0x6d8b) && //02 (hook)
+              (rom.wordAt(0x140F) == 0x6dc1) && //Cranking (hook)
+	      (rom.wordAt(0x14D5) == 0x6d9e) && //Post start fuel (hook)
+              (rom.wordAt(0x1EEF) == 0x6dac) && //TPS Tip-In (hook)   
+              (rom.wordAt(0x414D) == 0x6DD1));  //Battery Comp table(hook)             
+    case rtP72:
+      return ((rom.wordAt(0x05CA) == 0x676C) && //Final Value (hook)
+              (rom.wordAt(0x1C69) == 0x67A0) && //02 (hook)
+              (rom.wordAt(0x14F1) == 0x67D8) && //Cranking (hook)
+	      (rom.wordAt(0x1581) == 0x67B3) && //Post start fuel (hook)
+              (rom.wordAt(0x20FB) == 0x67C1));  //TPS Tip-In (hook)
+  }
+}
+
+
+// Plugin Check to catch legacy FuelTools / FV Fuel Tools installs /////////////////////
+function __hasOldFuelTools() {
+   rt = rom.base;
+   switch (rt) {
+    case 1: // P30
+		return (//(rom.wordAt(0x1277) == 0x78B9) &&
+			(rom.wordAt(0x1BA5) == 0x78C9) &&
+			(rom.wordAt(0x140F) == 0x78DF) &&
+			(rom.wordAt(0x1EEF) == 0x78F2) &&
+			(!rom.hasFuelMultiplier));
+    case 2: // P72
+		return (//(rom.wordAt(0x129E) == 0x676C) &&
+			(rom.wordAt(0x1C69) == 0x677C) &&
+			(rom.wordAt(0x14AD) == 0x6792) &&
+			(rom.wordAt(0x20FD) == 0x67A5) &&
+			(!rom.hasFuelMultiplier));
+   }
+}
+
+// Plugin Check for FV fuel tools ////////////////////////////////////////////////
+function __hasFVFuelTools() {
+   rt = rom.base;
+   switch (rt) {
+    case 1: // P30
+		return ((rom.wordAt(0x05d1) == 0x78B9) &&
+			(rom.wordAt(0x1BA5) == 0x78C9) &&
+			(rom.wordAt(0x140F) == 0x78DF) &&
+			(rom.wordAt(0x1EEF) == 0x78F2) &&
+			(!rom.hasFuelMultiplier));
+    case 2: // P72
+		return ((rom.wordAt(0x05ca) == 0x676C) &&
+			(rom.wordAt(0x1C69) == 0x677C) &&
+			(rom.wordAt(0x14AD) == 0x6792) &&
+			(rom.wordAt(0x20FD) == 0x67A5) &&
+			(!rom.hasFuelMultiplier));
+   }
+}
+
+
+// Plugin Handler //////////////////////////////////////////////////////////////
+function __FVBfuelToolsHandler() {
+//  if (__hasOldFuelTools()) {
+//    alert("This ROM contains an old version of Fuel Tools and will be updated. To learn more about the new Fuel Tools, go to 'Help > About Plugin > Fuel Tools'.");
+//    showBrowser('#SCRIPT_DIR#fuelTools\\about.html',570,380);
+//    __remFuelToolsP30();
+//    __addFVBFuelToolsToP30();
+//    return;        
+//  }
+  if (__hasFVBFuelTools())  //FV + Gear + Battery case
+	{
+  switch (rom.base) {
+    case rtP28:
+      break;
+
+    case rtP30:
+      rom.hasFinalMultiplier = 0;
+      rom.addressOf('MTX1') = 0x6D54;  // Important
+      rom.addFuelCorrection("Final Multiplier",0x6D54, 0x6D6C);
+      rom.addFuelCorrection("O2", 0x6D8F, 0x0000);
+      rom.addFuelCorrection("Cranking", 0x6DC3, 0x0000);
+      rom.addFuelCorrection("Post Startup", 0x6DA0, 0x0000);
+      rom.addFuelCorrection("Tip-in", 0x6DAE, 0x0000);
+      rom.addFuelCorrection("Tip-in Addtl", 0x6DB4, 0x0000);
+      rom.title += " FV+Gear";
+      break;
+
+    case rtP72:
+      rom.hasFinalMultiplier = 0;
+      rom.addressOf('MTX1') = 0x676E;  // Important
+      rom.addFuelCorrection("Final Multiplier",0x676E, 0x6784);
+      rom.addFuelCorrection("O2", 0x67A4, 0x0000);
+      rom.addFuelCorrection("Cranking", 0x67DD, 0x0000);
+      rom.addFuelCorrection("Post Startup", 0x67B5, 0x0000);
+      rom.addFuelCorrection("Tip-in", 0x67C5, 0x0000);
+      rom.addFuelCorrection("Tip-in Addtl", 0x67CB, 0x0000);
+      rom.title += " FV+Gear";
+      break;
+  }//end switch
+ 	}//end if(__hasFVBFuelTools)
+
+  else if(__hasFVFuelTools())  //Fuel Tools 1.7/1.8 case
+	{
+	switch (rom.base) {
+    case rtP28:
+      break;
+    case rtP30:
+      rom.hasFinalMultiplier = 0;
+      rom.addressOf('MTX1') = 0x78BB;  // Important
+      rom.addFuelCorrection("Final Multiplier",0x78BB, 0x0000);
+      rom.addFuelCorrection("O2", 0x78CD, 0x0000);
+      rom.addFuelCorrection("Cranking ???", 0x78E1, 0x0000);
+      rom.addFuelCorrection("Tip-in", 0x78F4, 0x0000);
+      rom.title += ' FV Mult';
+      break;
+    case rtP72:
+      // Fuel Multipliers
+      rom.addressOf('MTX1') = 0x676E;    // Important
+      rom.addFuelCorrection("Final Multiplier",0x676E, 0x0000);
+      rom.addFuelCorrection("O2", 0x6780, 0x0000);
+      rom.addFuelCorrection("Cranking ???", 0x6794, 0x0000);
+      rom.addFuelCorrection("Tip-in", 0x67A7, 0x0000);// Main Fuel
+      rom.hasFinalMultiplier = 0;
+      rom.title += ' FV Mult';
+      break;
+  } //end switch
+	}//end if(__hasFVFuelTools())
+
+  else if(__hasOldFuelTools())
+	{
+	switch (rom.base) {
+    case rtP28:
+      break;
+    case rtP30:
+      rom.hasFinalMultiplier = 0;
+      rom.addressOf('MTX1') = 0x78BB;  // Important
+      rom.addFuelCorrection("Old Fuel Multiplier",0x78BB, 0x0000);
+      rom.addFuelCorrection("O2", 0x78CD, 0x0000);
+      rom.addFuelCorrection("Cranking ???", 0x78E1, 0x0000);
+      rom.addFuelCorrection("Tip-in", 0x78F4, 0x0000);
+      rom.title += ' old fuel tools';
+      break;
+    case rtP72:
+      // Fuel Multipliers
+      rom.addressOf('MTX1') = 0x676E;    // Important
+      rom.addFuelCorrection("Old Fuel Multiplier",0x676E, 0x0000);
+      rom.addFuelCorrection("O2", 0x6780, 0x0000);
+      rom.addFuelCorrection("Cranking ???", 0x6794, 0x0000);
+      rom.addFuelCorrection("Tip-in", 0x67A7, 0x0000);// Main Fuel
+      rom.hasFinalMultiplier = 0;
+      rom.title += ' old fuel tools';
+      break;
+  } //end switch
+	}//end if(__hasOldFuelTools())
+}
+
+// Plugin Call /////////////////////////////////////////////////////////////////
+function __fuelTools(ask) {
+  if (ask == null) ask = false;
+  if (__hasFVBFuelTools()) return;
+  switch (rom.base) {
+    case rtP28:
+      break;
+    case rtP30:
+      showBrowser('#SCRIPT_DIR#fuelTools\\about.html',570,380);
+      if (ask && !confirm("Would you like to install Fuel Tools?")) return;
+      rom.gup();
+      __addFVBFuelToolsToP30();
+      rom.gup();
+      break;
+    case rtP72:
+      showBrowser('#SCRIPT_DIR#fuelTools\\about.html',570,380);
+      if (ask && !confirm("Would you like to install Fuel Tools?")) return;
+      rom.gup();
+      __addFVBFuelToolsToP72();
+      rom.gup();
+     break;
+  }
+  if (ask) reload();
+}
+
+// Plugin Info /////////////////////////////////////////////////////////////////
+function __aboutFuelTools() {
+  showBrowser('#SCRIPT_DIR#fuelTools\\about.html',570,380);
+}
+
+// Register Plugins ////////////////////////////////////////////////////////////
+addPlugin('John Cui', 'Fuel Tools', '__fuelTools(true)', '__aboutFuelTools()', 0);
+addRomHandler(rtP30, 'John Cui, Dave B.', '__FVBfuelToolsHandler()');
+addRomHandler(rtP72, 'Damian Badalamanti, Black R, Dave B.', '__FVBfuelToolsHandler()');
+
+////////////////////////////////////////////////////////////////////////////////
+// Injector Battery Offset Advanced Table Plugin
+////////////////////////////////////////////////////////////////////////////////
+function __IBOLoadCustomTable() {
+  // makes life easier
+  ct = window.customTable;
+  ct.height = 1;
+  ct.width = 7;
+  ct.fixedCols = 1;
+  ct.fixedRows = 1;
+  ct.fixedEditable = 1;
+  ct.description = 'Stock Injector Battery Offset table.  This is used during cranking and a few other startup related tasks.';
+  // Min and max values can only be integers
+  ct.graphMinX = 6;
+  ct.graphMaxX = 20;
+  ct.graphMinY = 0;
+  ct.graphMaxY = 3;
+  // Set graph labels
+  ct.graphLabelX = 'Battery Voltage';
+  ct.graphLabelY = 'Injector Pulse Width (ms)';
+  ct.showGraph = true;
+  include ('/plugins/batteryoffsetvalueslist.js');
+  
+  switch (rom.base) {
+  
+  case rtP28:
+    return false;
+  
+  case rtP30:
+  	ct.address = 0x61d6;
+	return true;
+  
+  case rtP72:
+	ct.address = 0x56b6
+    return true;
+  }
+}
+
+function __IBOGetCustomValue(c,r) {
+  var base = window.customTable.address;
+  // If row = 0 ... we're on the column headers
+  if (r == 0) {
+    if (c == 0) return 'Batt.(volts)';
+    else return (rom.byteAt(base+((c-1)*3))*0.052+6.26).toFixed(1);
+  // If row = 1, c == 0
+  } else if ((r == 1) && (c == 0)) {
+    return 'Inj.(ms)';
+  // If we're on the table itself
+  } else {
+    return (rom.wordAt(base+((c-1)*3)+1)*0.0032).toFixed(2);
+  }
+}
+
+function __IBOSetCustomValue(c,r,v) {
+  var base = window.customTable.address;
+  if (r == 0)	{
+	rom.byteAt(base+((c-1)*3)) = ((v-6.26)/0.052).toFixed(0);	
+		} //end r==0
+
+  else if (r == 1) {
+	rom.wordAt(base+((c-1)*3)+1) = (v/0.0032).toFixed(0);
+		} //end r==1
+}
+
+include ('/plugins/batteryoffsetvalues.js');
+
+function __MyIBOLoadCustomTable() {
+  // makes life easier
+  ct = window.customTable;
+  ct.height = 1;
+  ct.width = 7;
+  ct.fixedCols = 1;
+  ct.fixedRows = 1;
+  ct.fixedEditable = 0;
+  ct.description = 'Advanced Battery Offset table. \nWhen this table is used set final multiplier offset to 00.00\n' +
+  			'1)Find your injector offset with this table not used(00.00).\n2) Actual Volt == Found offset || for lower volt use larger offset || for higher volt use smaller offset';
+  // Min and max values can only be integers
+  ct.graphMinX = 6;
+  ct.graphMaxX = 20;
+  ct.graphMinY = 0;
+  ct.graphMaxY = 200;
+  // Set graph labels
+  ct.graphLabelX = 'Battery Voltage';
+  ct.graphLabelY = 'Fuel Offset';
+  ct.showGraph = true;
+  //include ('/plugins/batteryoffsetvalueslist.js');
+  
+  switch (rom.base) {
+  
+  case rtP28:
+    return false;
+  
+  case rtP30:
+  	ct.address = 0x6de6;
+	return true;
+  
+  case rtP72:
+//	ct.address = 0x56ce;
+//    return true;
+	return false;
+  }
+}
+function __MyIBOGetCustomValue(c,r) {
+  var base = window.customTable.address;
+  // If row = 0 ... we're on the column headers
+  if (r == 0) {
+    if (c == 0) return 'Batt.(volts)';
+    else return (rom.byteAt(base+((c-1)*3))*0.052+6.26).toFixed(1);
+  // If row = 1, c == 0
+  } else if ((r == 1) && (c == 0)) {
+    return 'Offset';
+  // If we're on the table itself
+  } else {
+    return (rom.wordAt(base+((c-1)*3)+1)/4).toFixed(2);
+  }
+}
+
+function __MyIBOSetCustomValue(c,r,v) {
+  var base = window.customTable.address;
+  rom.wordAt(base+((c-1)*3)+1) = (v*4).toFixed(2);
+}
+
+addCustomTable('Injector Battery Offset (Stock)',0,0,0,'__IBOLoadCustomTable','__IBOGetCustomValue','__IBOSetCustomValue');
+addCustomTable('Injector Battery Offset (Advanced)',0,0,0,'__MyIBOLoadCustomTable','__MyIBOGetCustomValue','__MyIBOSetCustomValue');
+
+// Per Gear Fuel Trim ////////////////////////////////////////////////////
+function __GearFuelLoadCustomTable() {
+  ct = window.customTable;
+  ct.height = 1;
+  ct.width = 5;
+  ct.fixedCols = 1;
+  ct.fixedRows = 1;
+  ct.fixedEditable = 0;
+  ct.description = 'Adjust per-gear fuel multiplier.  Use with caution.  Note: idle = gear 1';
+  ct.showGraph = false;
+  
+  switch (rom.base) {
+    case rtP28:
+      return false; 
+    case rtP30:
+      ct.address = 0x6d81;
+      return true;
+    case rtP72:
+      ct.address = 0x6796;
+      return true;
+  }
+  return false;
+}
+
+function __GearFuelGetCustomValue(c,r) {
+  var base = window.customTable.address;
+  if (r == 0) {
+    switch (c) {
+      case 0: return 'Gear:';
+      case 1: return 1;
+      case 2: return 2;
+      case 3: return 3;
+      case 4: return 4;
+      case 5: return 5;
+    }
+  } else if ((r == 1) && (c == 0)) {
+    return 'Multiplier:';
+  } else {
+    return (_word_to_multi(rom.wordAt(base + (2*(c - 1)))));
+  }
+}
+
+function __GearFuelSetCustomValue(c,r,v) {
+  var base = window.customTable.address;
+  rom.wordAt(base + (2*(c - 1))) = _multi_to_word(v);
+}
+
+//**********************************************************
+// Conversion formulas for gear fuel trim!!
+// these work where 00 is full rich and ff is full lean
+// due to a SWAP before the MUL
+//**********************************************************
+// Convert multi
+function _word_to_multi(w) {
+  return (w / 0x8000).toFixed(3);
+}
+
+function _multi_to_word(r) {
+  if (r < 0.00) return (0x0000);
+  else if (r > 1.99) return (0xFFFF);
+  else return (r * 0x8000);
+}
+
+addCustomTable('Per Gear Fuel Trim',0,0,0,'__GearFuelLoadCustomTable','__GearFuelGetCustomValue','__GearFuelSetCustomValue');

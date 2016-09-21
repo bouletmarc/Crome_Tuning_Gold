@@ -1,0 +1,101 @@
+<html>
+<head>
+<title>Custom TPS plugin</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+.formObjects {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-style: italic;
+	color: #000000;
+	border: 1px solid #000000;
+	background-color: #FFFFFF;
+}
+-->
+</style>
+</head>
+<body bgcolor="#FFFFFF" scroll="no" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<!-- ImageReady Slices (Untitled-2) -->
+<script language="javascript">
+<!--
+var
+crome = window.external;
+rom = crome.rom;
+
+function keyHandler () {
+var
+  key = window.event.keyCode;
+  if (((key < 48) || (key > 57)) && (key != 46)) window.event.keyCode = 0;
+}
+
+function getTPScalerVolts() {
+  return new Array((rom.byteAt(0x6FFA)*5/255),(rom.byteAt(0x6FF8)*5/255));
+}
+
+//-->
+</script>
+
+<table id="Table_01" width="450" height="220" border="0" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="border-collapse: collapse" bordercolor="#ffffff">
+	<tr>
+		<td colspan="2" valign="top" width="450">
+			<img src="images/template_01.png"></td>
+	</tr>
+	<tr>
+		<td valign="top" width="256">
+			<img src="images/template_02.png" width="278" height="168" alt=""></td>
+		<td valign="top" width="194"><br>
+		<form method="POST" action="" name="frminput" id="frminput" align="right">
+              <font color="#000000" face="Verdana" size="2"><br>&nbsp;Minimum TPS</font><font color="#000000">
+              </font>
+              <input type="text" name="txtmin" id="txtmin" size="4" class="formObjects" onKeyPress="keyHandler()"><font color="#000000" face="Verdana" size="2">&nbsp;Volts</font><br>
+              <font color="#000000"><font face="Verdana" size="2"><br>
+              Maximum TPS</font> 
+              <input type="text" name="txtmax" id="txtmax" size="4" class="formObjects" onKeyPress="keyHandler()"><font color="#000000" face="Verdana" size="2">&nbsp;Volts</font><br>
+              </font><br>
+              <input type="submit" value="Apply To Rom" name="B1" class="formObjects" style="float: right" onclick="updateTPS(frminput.txtmin.value, frminput.txtmax.value)"></p>
+            </form><br>
+<script language="javascript">
+<!--
+
+/*********************************************************
+* Update RPM AND TPS VALUE IN ROM			* 
+*********************************************************/
+
+if (rom.byteAt(0x4473)!=0xB9){
+	frminput.txtmin.value = 0.47;
+	frminput.txtmax.value = 4.53;
+}
+else{
+	frminput.txtmin.value = (getTPScalerVolts()[0]).toFixed(2);
+	frminput.txtmax.value = (getTPScalerVolts()[1]).toFixed(2);
+}
+function updateTPS(r,t) {
+	if (r<0 || t<0 || r>5 || t > 5) {
+		alert ('TPS voltage out of range. (0>Volts<5)');
+		return;
+	}
+	if (isNaN(r) ||(r == '') || isNaN(r) || (r == '')) { 
+		alert ('Please fill in a TPS voltage');
+		return;
+	}
+		r = Math.round(frminput.txtmin.value * 255/5);
+		t = Math.round(frminput.txtmax.value * 255/5);
+		rom.gup();	
+		rom.byteAt(0x6FFA) = r;
+		rom.byteAt(0x6FF8) = t;
+		crome.refresh()
+		rom.gup();
+		window.close();
+	
+}
+
+
+//-->
+</script>
+        </td>
+	</tr>
+</table>
+<!-- End ImageReady Slices -->
+</body>
+</html>

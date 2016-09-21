@@ -1,0 +1,418 @@
+/*
+Advanced Boost Tools handler version 1.8
+v1.8: uses rom.ByteToMillibar and rom.MillibarToByte instead of hardcoded functions
+V1.7: NC
+V1.6: NC
+V1.5: No changes in handler since 1.4 - changes elsewhere
+V1.4:
+-removed logic to check and process multipliers - leave that shit to FVFuelTools
+-this is done to allow both Final Value and old schhol mults to work
+-may work without FVFuel tools installed - use version 1.4 or greater of FuelTools.cpf to be safe
+*/
+
+function __advancedBoostToolsPlusP30Handler () {
+  // advancedBoostTools+ Check
+  if ((rom.wordAt(0x0829) == 0xA3F5) &&
+      (rom.wordAt(0x0A13) == 0xA3F5) &&
+      (rom.wordAt(0x0A17) != 0x6E72) &&
+      (rom.wordAt(0x15A9) == 0xA3C5)) {
+
+     MapSize = rom.byteAt(0x0B3A);
+     BstColumns = MapSize - 0x10;
+     hiIgnLmbTblHgt = rom.byteAt(0x0B3C);
+     loIgnLmbTblHgt = rom.byteAt(0x0B3C);
+     hiFuelTblHgt = hiIgnLmbTblHgt + 0x01;
+     loFuelTblHgt = loIgnLmbTblHgt + 0x01;
+
+     HiRevTblCor = hiIgnLmbTblHgt - 0x14;
+     LoRevTblCor = loIgnLmbTblHgt - 0x14;
+     HiLmbTblCor = BstColumns * hiIgnLmbTblHgt + HiRevTblCor * 0x10;
+     LoLmbTblCor = BstColumns * loIgnLmbTblHgt + LoRevTblCor * 0x10;
+     HiIgnTblCor = BstColumns * hiIgnLmbTblHgt + HiRevTblCor * 0x10;
+     LoIgnTblCor = BstColumns * loIgnLmbTblHgt + LoRevTblCor * 0x10;
+     HiFulTblCor = BstColumns * hiFuelTblHgt + HiRevTblCor * 0x10;
+     LoFulTblCor = BstColumns * loFuelTblHgt + LoRevTblCor * 0x10;
+
+     LoLmbTblCor = LoLmbTblCor + HiLmbTblCor;
+     LoIgnTblCor = HiIgnTblCor + LoIgnTblCor;
+     HiFulTblCor = LoIgnTblCor + HiFulTblCor;
+     LoFulTblCor = HiFulTblCor + LoFulTblCor;
+     HiRevTblCor = LoFulTblCor + HiRevTblCor;
+     LoRevTblCor = HiRevTblCor + LoRevTblCor;
+     ScalarCor = LoRevTblCor + BstColumns;
+
+     rom.hasBoost = 0;
+     rom.addressOf('NFO_LOW_TABLE')       = 0x1400 + MapSize;
+     rom.addressOf('NFO_HIGH_TABLE')      = 0x1400 + MapSize;
+     rom.addressOf('LOW_REV_SCALAR')      = 0x7102 - LoRevTblCor;
+     rom.addressOf('HIGH_REV_SCALAR')     = 0x7116 - HiRevTblCor;
+     rom.addressOf('LOW_FUEL')            = 0x712A - LoFulTblCor;
+     rom.addressOf('HIGH_FUEL')           = 0x727A - HiFulTblCor;
+     rom.addressOf('LOW_IGNITION')        = 0x73CA - LoIgnTblCor;
+     rom.addressOf('HIGH_IGNITION')       = 0x750A - HiIgnTblCor;
+     rom.addressOf('LOW_O2TARGET')        = 0x7D7F - LoLmbTblCor;
+     rom.addressOf('HIGH_O2TARGET')       = 0x7EBF - HiLmbTblCor;
+     rom.addressOf('LOW_MAP_SCALAR')      = 0x70F2 - ScalarCor;
+     rom.addressOf('HIGH_MAP_SCALAR')     = 0x70F2 - ScalarCor;
+     rom.addressOf('NFO_MAP_MIN')         = rom.wordAt(0x70EE - ScalarCor);
+     rom.addressOf('NFO_MAP_MAX')         = rom.wordAt(0x70F0 - ScalarCor);
+     switch (rom.byteAt(0x70ED - ScalarCor)) {
+        case 0x01:
+           rom.hasBoost = 1;
+           break;
+        case 0x02:
+           rom.hasBoost = 2;
+           break;
+        case 0x03:
+           rom.hasBoost = 3;
+     }
+
+     rom.title = 'Advanced Boost Tools+ P30';
+  }
+}
+
+// For compatibility reasons
+function __boostToolsPlusP30Handler () {
+  // BoostTools+ Check
+  if ((rom.wordAt(0x0829) == 0xA3F5) &&
+      (rom.wordAt(0x0A13) == 0xA3F5) &&
+      (rom.wordAt(0x0A17) == 0x6E72)) {
+
+     rom.hasBoost = 0;
+     rom.addressOf('NFO_LOW_TABLE')       = 0x1410;
+     rom.addressOf('NFO_HIGH_TABLE')      = 0x1410;
+     rom.addressOf('LOW_REV_SCALAR')      = 0x6E82;
+     rom.addressOf('HIGH_REV_SCALAR')     = 0x6E96;
+     rom.addressOf('LOW_FUEL')            = 0x6EAA;
+     rom.addressOf('HIGH_FUEL')           = 0x6FFA;
+     rom.addressOf('LOW_IGNITION')        = 0x714A;
+     rom.addressOf('HIGH_IGNITION')       = 0x728A;
+     rom.addressOf('LOW_O2TARGET')        = 0x73CA;
+     rom.addressOf('HIGH_O2TARGET')       = 0x750A;
+     rom.addressOf('LOW_MAP_SCALAR')      = 0x6E72;
+     rom.addressOf('HIGH_MAP_SCALAR')     = 0x6E72;
+     rom.addressOf('NFO_MAP_MIN')         = rom.wordAt(0x6E6E);
+     rom.addressOf('NFO_MAP_MAX')         = rom.wordAt(0x6E70);
+     switch (rom.byteAt(0x6E6D)) {
+        case 0x01:
+           rom.hasBoost = 1;
+           break;
+        case 0x02:
+           rom.hasBoost = 2;
+           break;
+        case 0x03:
+           rom.hasBoost = 3;
+     }
+
+     rom.title = 'BOOST Tools+ P30';
+  }
+}
+
+// For compatibility reasons
+function __boostToolsP30Handler () {
+  // BoostTools Check
+  if ((rom.wordAt(0x0A13) == 0xA3F5) &&
+      (rom.wordAt(0x0A17) == 0x6E72)) {
+
+     rom.hasBoost = 0;
+     rom.addressOf('NFO_LOW_TABLE')       = 0x1410;
+     rom.addressOf('NFO_HIGH_TABLE')      = 0x1410;
+     rom.addressOf('LOW_REV_SCALAR')      = 0x6E82;
+     rom.addressOf('HIGH_REV_SCALAR')     = 0x6E96;
+     rom.addressOf('LOW_FUEL')            = 0x6EAA;
+     rom.addressOf('HIGH_FUEL')           = 0x6FFA;
+     rom.addressOf('LOW_IGNITION')        = 0x714A;
+     rom.addressOf('HIGH_IGNITION')       = 0x728A;
+     rom.addressOf('LOW_O2TARGET')        = 0x73CA;
+     rom.addressOf('HIGH_O2TARGET')       = 0x750A;
+     rom.addressOf('LOW_MAP_SCALAR')      = 0x6E72;
+     rom.addressOf('HIGH_MAP_SCALAR')     = 0x6E72;
+     rom.addressOf('NFO_MAP_MIN')         = rom.wordAt(0x6E6E);
+     rom.addressOf('NFO_MAP_MAX')         = rom.wordAt(0x6E70);
+     switch (rom.byteAt(0x6E6D)) {
+        case 0x01:
+           rom.hasBoost = 1;
+           break;
+        case 0x02:
+           rom.hasBoost = 2;
+           break;
+        case 0x03:
+           rom.hasBoost = 3;
+     }
+     rom.title = 'Boost Tools P30';
+  }
+}
+
+function __boostToolsPlusP72Handler () {
+  // BoostTools+ Check
+  if ((rom.wordAt(0x0841) == 0xBBF5) &&
+      (rom.wordAt(0x0A9F) == 0xBBF5) &&
+      (rom.wordAt(0x1651) == 0xBBC5) &&
+      (rom.wordAt(0x16DE) == 0xDFC4)) {
+
+     MapSize = rom.byteAt(0x0B86);
+     BstColumns = MapSize - 0x10;
+     hiIgnLmbTblHgt = rom.byteAt(0x0BA2);
+     loIgnLmbTblHgt = rom.byteAt(0x0B88);
+     hiFuelTblHgt = hiIgnLmbTblHgt + 0x01;
+     loFuelTblHgt = loIgnLmbTblHgt + 0x01;
+
+     HiRevTblCor = hiIgnLmbTblHgt - 0x0F;
+     LoRevTblCor = loIgnLmbTblHgt - 0x14;
+     HiLmbTblCor = BstColumns * hiIgnLmbTblHgt + HiRevTblCor * 0x10;
+     LoLmbTblCor = BstColumns * loIgnLmbTblHgt + LoRevTblCor * 0x10;
+     HiIgnTblCor = BstColumns * hiIgnLmbTblHgt + HiRevTblCor * 0x10;
+     LoIgnTblCor = BstColumns * loIgnLmbTblHgt + LoRevTblCor * 0x10;
+     HiFulTblCor = BstColumns * hiFuelTblHgt + HiRevTblCor * 0x10;
+     LoFulTblCor = BstColumns * loFuelTblHgt + LoRevTblCor * 0x10;
+
+
+
+     HiLmbTblCor = HiLmbTblCor;
+     LoLmbTblCor = HiLmbTblCor + LoLmbTblCor;
+     HiIgnTblCor = LoLmbTblCor + HiIgnTblCor;
+     LoIgnTblCor = HiIgnTblCor + LoIgnTblCor;
+     HiFulTblCor = LoIgnTblCor + HiFulTblCor;
+     LoFulTblCor = HiFulTblCor + LoFulTblCor;
+     HiRevTblCor = LoFulTblCor + HiRevTblCor;
+     LoRevTblCor = HiRevTblCor + LoRevTblCor;
+     ScalarCor = LoRevTblCor + BstColumns;
+
+     rom.hasBoost = 0;
+     rom.addressOf('CHECKSUM') = 0x7FFF;
+     rom.addressOf('NFO_LOW_TABLE')       = (0x100 * loIgnLmbTblHgt) + MapSize;
+     rom.addressOf('NFO_HIGH_TABLE')      = (0x100 * hiIgnLmbTblHgt) + MapSize;
+     rom.addressOf('LOW_REV_SCALAR')      = 0x792C - LoRevTblCor;
+     rom.addressOf('HIGH_REV_SCALAR')     = 0x7940 - HiRevTblCor;
+     rom.addressOf('LOW_FUEL')            = 0x794F - LoFulTblCor;
+     rom.addressOf('HIGH_FUEL')           = 0x7A9F - HiFulTblCor;
+     rom.addressOf('LOW_IGNITION')        = 0x7B9F - LoIgnTblCor;
+     rom.addressOf('HIGH_IGNITION')       = 0x7CDF - HiIgnTblCor;
+     rom.addressOf('LOW_O2TARGET')        = 0x7DCF - LoLmbTblCor;
+     rom.addressOf('HIGH_O2TARGET')       = 0x7F0F - HiLmbTblCor;//cpu o2 target = 0x7F0F
+     rom.addressOf('HIGH_MAP_SCALAR')     = 0x791C - ScalarCor;
+     rom.addressOf('LOW_MAP_SCALAR')      = 0x791C - ScalarCor;
+     rom.addressOf('NFO_MAP_MIN')         = rom.wordAt(0x7918 - ScalarCor);
+     rom.addressOf('NFO_MAP_MAX')         = rom.wordAt(0x791A - ScalarCor);
+     rom.hasBoost = 0;
+     switch (rom.byteAt(0x7917 - ScalarCor)) {
+        case 0x01:
+           rom.hasBoost = 1;
+           break;
+        case 0x02:
+           rom.hasBoost = 2;
+           break;
+        case 0x03:
+           rom.hasBoost = 3;
+     }
+
+     rom.title = 'Advanced Boost Tools+ P72';
+  }
+}
+
+// For compatibility reasons
+function __boostToolsP72Handler () {
+  // BoostTools Check
+  if((rom.wordAt(0x0A9F) == 0xBBF5) &&
+     (rom.wordAt(0x0AA3) == 0x7A4E)){
+     rom.hasBoost = 0;
+     rom.addressOf('CHECKSUM') = 0x7FFF;
+     rom.addressOf('NFO_LOW_TABLE')       = 0x1410;
+     rom.addressOf('NFO_HIGH_TABLE')      = 0x0F10;
+     rom.addressOf('LOW_REV_SCALAR')      = 0x7A5E;
+     rom.addressOf('HIGH_REV_SCALAR')     = 0x7A72;
+     rom.addressOf('LOW_FUEL')            = 0x7A8F;
+     rom.addressOf('HIGH_FUEL')           = 0x7BDF;
+     rom.addressOf('HIGH_IGNITION')       = 0x7CDF;
+     rom.addressOf('LOW_IGNITION')        = 0x7DCF;
+     rom.addressOf('HIGH_O2TARGET')       = 0x7909;//cpu o2 target = 0x7F0F
+     rom.addressOf('LOW_O2TARGET')        = 0x7909;
+     rom.addressOf('HIGH_MAP_SCALAR')     = 0x7A4E;
+     rom.addressOf('LOW_MAP_SCALAR')      = 0x7A4E;
+     rom.addressOf('NFO_MAP_MIN')         = rom.wordAt(0x7A4A);
+     rom.addressOf('NFO_MAP_MAX')         = rom.wordAt(0x7A4C);
+     rom.hasBoost = 0;
+     switch (rom.byteAt(0x7A49)) {
+        case 0x01:
+           rom.hasBoost = 1;
+           break;
+        case 0x02:
+           rom.hasBoost = 2;
+           break;
+        case 0x03:
+           rom.hasBoost = 3;
+     }
+     rom.title = 'BOOST Tools P72';
+   }
+}
+
+function __HiResP72IIHandler () {
+  // HiRes Check
+   if((rom.byteAt(0x0BA2) == 0x14) && (rom.wordAt(0x0A50) == 0x7B13) && (rom.wordAt(0x16EB) == 0x7F37)){
+     rom.hasBoost = 0;
+     rom.addressOf('CHECKSUM') = 0x7FFF;
+     rom.addressOf('NFO_LOW_TABLE')       = 0x140A;
+     rom.addressOf('NFO_HIGH_TABLE')      = 0x140A;
+     rom.addressOf('LOW_REV_SCALAR')      = 0x7B13;
+     rom.addressOf('HIGH_REV_SCALAR')     = 0x7B27;
+     rom.addressOf('LOW_FUEL')            = 0x7B3B;
+     rom.addressOf('HIGH_FUEL')           = 0x7C0D;
+     rom.addressOf('LOW_IGNITION')        = 0x7CDF;
+     rom.addressOf('HIGH_IGNITION')       = 0x7DA7;
+     rom.addressOf('LOW_O2TARGET')        = 0x7E6F;
+     rom.addressOf('HIGH_O2TARGET')       = 0x7F37;
+     rom.addressOf('LOW_MAP_SCALAR')      = 0x7B03;
+     rom.addressOf('HIGH_MAP_SCALAR')     = 0x7B03;
+     rom.title = 'HiRes P72II';
+   }
+}
+
+function __boostToolsPlusHiResP72Handler () {
+  // BoostTools+ Check
+  if ((rom.wordAt(0x0841) == 0xBBF5) &&
+      (rom.wordAt(0x0A9F) == 0xBBF5) &&
+      (rom.byteAt(0x0BA2) == 0x14)) {
+
+     MapSize = rom.byteAt(0x0B86);
+     BoostColumns = MapSize - 0x10;
+     HiLmbTblCor = BoostColumns * rom.byteAt(0x0BA2);
+     LoLmbTblCor = BoostColumns * 0x14;
+     HiIgnTblCor = BoostColumns * rom.byteAt(0x0BA2);
+     LoIgnTblCor = BoostColumns * 0x14;
+     HiFulTblCor = BoostColumns * (rom.byteAt(0x0BA2) + 0x01);
+     LoFulTblCor = BoostColumns * 0x15;
+     HiRevTblCor = 0x00;
+     LoRevTblCor = 0x00;
+
+     LoLmbTblCor = HiLmbTblCor + LoLmbTblCor;
+     HiIgnTblCor = LoLmbTblCor + HiIgnTblCor;
+     LoIgnTblCor = HiIgnTblCor + LoIgnTblCor;
+     HiFulTblCor = LoIgnTblCor + HiFulTblCor;
+     LoFulTblCor = HiFulTblCor + LoFulTblCor;
+     HiRevTblCor = LoFulTblCor + HiRevTblCor;
+     LoRevTblCor = HiRevTblCor + LoRevTblCor;
+     ScalarCor = LoRevTblCor + BoostColumns;
+
+     rom.hasBoost = 0;
+     rom.addressOf('CHECKSUM') = 0x7FFF;
+     rom.addressOf('NFO_LOW_TABLE')       = 0x1400 + MapSize;
+     rom.addressOf('NFO_HIGH_TABLE')      = 0x1400 + MapSize;
+     rom.addressOf('LOW_REV_SCALAR')      = 0x792C - LoRevTblCor;
+     rom.addressOf('HIGH_REV_SCALAR')     = 0x7940 - HiRevTblCor;
+     rom.addressOf('LOW_FUEL')            = 0x794F - LoFulTblCor;
+     rom.addressOf('HIGH_FUEL')           = 0x7A9F - HiFulTblCor;
+     rom.addressOf('LOW_IGNITION')        = 0x7B9F - LoIgnTblCor;
+     rom.addressOf('HIGH_IGNITION')       = 0x7CDF - HiIgnTblCor;
+     rom.addressOf('LOW_O2TARGET')        = 0x7DCF - LoLmbTblCor;
+     rom.addressOf('HIGH_O2TARGET')       = 0x7F0F - HiLmbTblCor;//cpu o2 target = 0x7F0F
+     rom.addressOf('HIGH_MAP_SCALAR')     = 0x791C - ScalarCor;
+     rom.addressOf('LOW_MAP_SCALAR')      = 0x791C - ScalarCor;
+     rom.addressOf('NFO_MAP_MIN')         = rom.wordAt(0x7918 - ScalarCor);
+     rom.addressOf('NFO_MAP_MAX')         = rom.wordAt(0x791A - ScalarCor);
+     rom.hasBoost = 0;
+     switch (rom.byteAt(0x7917 - ScalarCor)) {
+        case 0x01:
+           rom.hasBoost = 1;
+           break;
+        case 0x02:
+           rom.hasBoost = 2;
+           break;
+        case 0x03:
+           rom.hasBoost = 3;
+     }
+
+     rom.title = 'Advanced Boost Tools+ HiResP72II';
+  }
+}
+
+function __boostToolsPlusAdvEdit() {
+  switch (rom.base) {
+    case rtP30:
+      if ((rom.wordAt(0x0829) == 0xA3F5) &&
+         (rom.wordAt(0x0A13) == 0xA3F5)) {
+        v = prompt("Adv. Boost Tools+ MAP Cutoff Edit", "MAP cutoff threshold (mbar)", rom.byteToMillibar(rom.byteAt(0x082C)));
+        if (v) {
+         v = parseInt(v);
+         if (v < 0) v = 0
+         else if (v > (rom.addressOf('NFO_MAP_MAX') - 0x8000)) v = (rom.addressOf('NFO_MAP_MAX') - 0x8000);
+         if (rom.byteAt(0x082C) != v) rom.byteAt(0x082C) = rom.MillibarToByte(v);
+        }
+      }else
+           alert("This ROM does not have 'Boost Tools+' installed. Please install 'Boost Tools+' first.");
+    break;
+    case rtP72:
+      if ((rom.wordAt(0x0841) == 0xBBF5) &&
+         (rom.wordAt(0x0A9F) == 0xBBF5)) {
+
+
+        v = prompt("Adv. Boost Tools+ MAP Cutoff Edit", "MAP cutoff threshold (mbar)", rom.byteToMillibar(rom.byteAt(0x0844)));
+        if (v) {
+         v = parseInt(v);
+         if (v < 0) v = 0
+         else if (v > (rom.addressOf('NFO_MAP_MAX') - 0x8000)) v = (rom.addressOf('NFO_MAP_MAX') - 0x8000);
+         if (rom.byteAt(0x0844) != v) rom.byteAt(0x0844) = rom.MillibarToByte(v);
+        }
+      }else
+           alert("This ROM does not have 'Boost Tools+' installed. Please install 'Boost Tools+' first.");
+    break;
+  }
+}
+
+function __boostToolsClosedLoopSwitchEdit() {
+  switch (rom.base) {
+    case rtP30:
+      if ((rom.wordAt(0x15A9) == 0xA3C5) &&
+          (rom.wordAt(0x6D33) == 0x6152) &&
+	  (rom.wordAt(0x6D39) == 0x615E)) {
+        v = prompt("Load Dependent 'Closed Loop' Switch", "Disable closed loop above(mbar)", rom.byteToMillibar(rom.byteAt(0x15AC)));
+        if (v) {
+         v = parseInt(v);
+         if (v < 0) v = 0
+         else if (v > (rom.addressOf('NFO_MAP_MAX') - 0x8000)) v = (rom.addressOf('NFO_MAP_MAX') - 0x8000);
+         if (rom.byteAt(0x15AC) != v) rom.byteAt(0x15AC) = rom.MillibarToByte(v);
+        }
+      }else
+           alert("This ROM does not have 'Advanced Boost Tools+' installed. Please install 'Advanced Boost Tools+' first.");
+    break;
+    case rtP72:
+      if ((rom.wordAt(0x1651) == 0xBBC5) &&
+	  (rom.wordAt(0x165F) == 0x5632) &&
+	  (rom.wordAt(0x1665) == 0x563E)) {
+        v = prompt("Load Dependent 'Closed Loop' Switch", "Disable closed loop above(mbar)", rom.byteToMillibar(rom.byteAt(0x1654)));
+        if (v) {
+         v = parseInt(v);
+         if (v < 0) v = 0
+         else if (v > (rom.addressOf('NFO_MAP_MAX') - 0x8000)) v = (rom.addressOf('NFO_MAP_MAX') - 0x8000);
+         if (rom.byteAt(0x1654) != v) rom.byteAt(0x1654) = rom.MillibarToByte(v);
+        }
+      }else
+           alert("This ROM does not have 'Advanced Boost Tools+' installed. Please install 'Advanced Boost Tools+' first.");
+    break;
+  }
+}
+
+function __boostToolsPlus() {
+  if (rom.base == 0) {
+    alert("This plugin only has support for P30, P72, and HiResII P72.\nP28 support will not be added.");
+    return;
+  }
+  else if (rom.hasITB == 1) {
+    alert("This plugin cannot work in conjunction with boost plugins.");
+    return;
+  }
+  showBrowser('#SCRIPT_DIR#advBoostTools\\about.html',570,380);
+  showBrowser('#SCRIPT_DIR#advBoostTools\\index.html',570,380);
+}
+function __aboutBoostToolsPlus() {
+  showBrowser('#SCRIPT_DIR#advBoostTools\\about.html',570,380);
+}
+
+addRomHandler(rtP30, 'John Cui', '__boostToolsP30Handler()');
+addRomHandler(rtP30, 'John Cui', '__boostToolsPlusP30Handler()');
+addRomHandler(rtP30, 'John Cui', '__advancedBoostToolsPlusP30Handler()');
+addRomHandler(rtP72, 'Damian Badalamenti', '__HiResP72IIHandler ()');
+addRomHandler(rtP72, 'Damian Badalamenti', '__boostToolsP72Handler()');
+addRomHandler(rtP72, 'Damian Badalamenti', '__boostToolsPlusP72Handler()');
+addPlugin('John Cui & Damian Badalamenti', 'Advanced BoostTools+', '__boostToolsPlus()', '__aboutBoostToolsPlus()', 0);
+addPlugin('John Cui & Damian Badalamenti', 'Advanced BoostTools+ MAP Cutoff Edit', '__boostToolsPlusAdvEdit()', '__aboutBoostToolsPlus()', 3);
+addPlugin('Damian Badalamenti', 'Advanced BoostTools+ Close Loop MAX Load Edit', '__boostToolsClosedLoopSwitchEdit()', '__aboutBoostToolsPlus()', 3);

@@ -1,0 +1,86 @@
+/**************************************************************
+** Add Fuel Multipliers..
+** Ver. 1.2
+** auth: Damian Badalamenti
+** desc:
+**/
+
+function P28_FuelMods () {
+    /*rom.addressOf('MTX1') = 0x####;
+    rom.addressOf('MTX3') = 0x####;
+    rom.addressOf('MTX5') = 0x####;
+    rom.hasFinalMultiplier = 1;*/
+    refresh ();
+}
+
+function P30_FuelMods () {
+
+    if (hasAdvBoostToolsPlus()) {
+	rom.addressOf('MTX5') = 0X7AD2;
+       kEctEnrichAddress = 0x7AD4;
+       return;
+}
+else if (rom.wordAt(0x1274) == 0X7A4D) {
+	rom.addressOf('MTX1') = 0X7ACA;
+       rom.addressOf('MTX2') = 0X7ACC;
+       rom.addressOf('MTX3') = 0X7ACE; 
+       rom.addressOf('MTX4') = 0X7AD0;
+       rom.addressOf('MTX5') = 0X7AD2;
+       kEctEnrichAddress = 0x7AD4;
+       return;
+	}
+}
+
+
+function P72_FuelMods () {
+    if (rom.wordAt(0x129E) == 0x70C0){
+       rom.addressOf('MTX1') = 0x7140;
+       rom.addressOf('MTX2') = 0x7142;
+       rom.addressOf('MTX3') = 0x7144;
+       rom.addressOf('MTX4') = 0x7146;
+       rom.addressOf('MTX5') = 0x7148;
+rom.hasFinalMultiplier = 1;
+       kEctEnrichAddress = 0x714A;
+
+       
+       refresh ();
+    }
+}
+
+function hasAdvBoostToolsPlus () {
+  rt = rom.base;
+	switch (rt) {
+    case 1: // P30
+	return ((rom.wordAt(0x0829) == 0xA3F5) &&
+                (rom.wordAt(0x0A13) == 0xA3F5) &&
+                (rom.wordAt(0x0A17) != 0x6E72) &&
+                (rom.wordAt(0x1277) == 0x78B9) &&
+                (rom.wordAt(0x15A9) == 0xA3C5) &&
+                (rom.wordAt(0x1BA5) == 0x78C9) &&
+                (rom.wordAt(0x140F) == 0x78DF) &&
+                (rom.wordAt(0x1EEF) == 0x78F2));
+    case 2: // P72
+	return ((rom.wordAt(0x0841) == 0xBBF5) &&
+                (rom.wordAt(0x0A9F) == 0xBBF5) &&
+                (rom.wordAt(0x129E) == 0x676C) &&
+		(rom.wordAt(0x1C69) == 0x677C) &&
+		(rom.wordAt(0x14AD) == 0x6792) &&
+		(rom.wordAt(0x16DE) == 0xDFC4) &&
+		(rom.wordAt(0x20FD) == 0x67A5));
+    }
+}
+
+function __addFuelMultipliers() {
+  if (rom.base !=  2 && rom.base != 1) {
+    alert("This plugin only has support for P30 and P72 ROMs right now.");
+    return;
+  }
+  showBrowser('plugins\\addFuelMultipliers\\index.html',625,480);
+}
+function __aboutaddFuelMultipliers() {
+  showBrowser('plugins\\addFuelMultipliers\\about.html',380,350);
+}
+//addRomHandler(rtP28, 'Damian Badalamenti', 'P28_FuelMods()');
+addRomHandler(rtP30, 'Damian Badalamenti', 'P30_FuelMods()');
+addRomHandler(rtP72, 'Damian Badalamenti', 'P72_FuelMods()');
+addPlugin('Damian Badalamenti', 'Add/Edit Fuel Enrichment', '__addFuelMultipliers()', '__aboutaddFuelMultipliers()', 1);

@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Add rpm features - Index</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body {
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	background-color: #000000;
+}
+body, td, th {
+	color: #FFFFFF;
+	font-family: Arial, Helvetica, sans-serif;
+}
+-->
+</style>
+<link href="master.css" rel="stylesheet" type="text/css">
+<script src="addExtrafeatures.js"></script>
+<script language="javascript">
+<!--
+var
+	curPage = 1;
+
+/**************************************************************
+** goNext()
+**
+** desc: Called by btnNext (next button) to check if it is
+**       OK to proceed with the next page
+**/
+function goNext() {
+  if (ifrmMain.canGoNext()) {
+    curPage++;
+    ifrmMain.location = "page" + curPage + ".html";
+    btnBack.disabled = (curPage == 1 || curPage == 2);
+    btnCancel.disabled = (curPage == 2);
+  }
+}
+/**************************************************************
+** goBack()
+**
+** desc: Called by the btnBack (back button) to go to the
+**       previous page
+**/
+function goBack() {
+  if (curPage > 1) {
+    curPage--;
+    ifrmMain.location = "page" + curPage + ".html";
+    btnBack.disabled = (curPage == 1 || curPage == 2);
+    btnCancel.disabled = (curPage == 2);
+  }
+}
+
+/**************************************************************
+** CloseWindow()
+** desc: Called by page2, to close the window.
+**
+**/
+function CloseWindow() {
+	window.close();
+}
+
+/**************************************************************
+** keepROMValues
+** desc: Called by page1, adds the extra features to the rom
+**/
+function keepROMValues () {
+  window.external.rom.gup();     // begin group undo
+  addRpmLimitsToROM(window.external.rom.base);
+  addShiftLightToROM(window.external.rom.base);
+  window.external.rom.gup();     // end group undo
+  window.external.reload();
+}
+
+//-->
+</script>
+</head>
+
+<body scroll="no">
+<table width="500" height="150"  border="0" cellpadding="0" cellspacing="0">
+ <tr>
+  <td width="100" align="center" valign="middle"><img src="imgs/RPM.gif" width="100" height="100"></td>
+  <td align="center" valign="middle">
+   <table width="100%" height="150"  border="0" cellpadding="0" cellspacing="0">
+    <tr>
+     <td height="30" align="middle" valign="bottom">
+      <span class="pageTitle">
+        ADD EXTRA FEATURES
+      </span>
+     </td>
+    </tr>
+    <tr>
+     <td height="70" align="center" valign="middle">
+      <iframe src="page1.html" name="ifrmMain" width="370" marginwidth="0" height="70" marginheight="0" align="middle" scrolling="auto" frameborder="0">
+      This is an iframe element. If you see this message then your browser does not support iframes. Please upgrade your browser to IE 5.0 or higher. Thank you.</iframe>
+     </td>
+    </tr>
+    <tr>
+     <td height="50" align="right">
+     	<input name="btnBack" type="button" class="formObjects" id="btnBack" value="< Back" onClick="goBack()" disabled>
+      	<input name="btnNext" type="button" class="formObjects" id="btnNext" value="Next >" onClick="goNext()">&nbsp;
+      	<input name="btnCancel" type="button" class="formObjects" id="btnCancel" onClick="window.close()" value="Cancel">
+      </script>
+     </td>
+    </tr>
+   </table>
+  </td>
+ </tr>
+</table>
+</body>
+</html>

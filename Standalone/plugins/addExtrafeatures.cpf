@@ -1,0 +1,92 @@
+function _p28_ExtraMods () {
+    //if (rom.wordAt(0x48E2) == 0x7E68) p28_ftl_fts_bcut();
+    //if (rom.wordAt(0x####) == 0x####) p28_ShiftLt();
+}
+
+function _p30_ExtraMods () {
+    if (rom.wordAt(0x3F99) == 0x79E6) p30_ftl_fts_bcut();
+    if (rom.wordAt(0x42AF) == 0x7A2A) p30_ShiftLt();
+}
+
+function _p72_ExtraMods () {
+  if (rom.wordAt(0x3FC4) == 0x6899) p72_ftl_fts_bcut();
+  if (rom.wordAt(0x4292) == 0x68DF) p72_ShiftLt();
+}
+
+/////////////////////////////////////////////////////////////////////
+/*******************************************************************/
+
+function p28_ftl_fts_bcut() {
+    rom.addressOf('LAUNCH_CUT') = 0x7E6C;
+    rom.addressOf('LAUNCH_RES') = 0x7E68;
+    rom.hasLaunchControl = 1;
+    //rom.addressOf('SHIFT_CUT') = 0x####;
+    //rom.addressOf('SHIFT_RES') = 0x####;
+    //rom.hasFullThrottleShift = 1;
+    refresh ();
+}
+
+function p30_ftl_fts_bcut(){
+    rom.addressOf('LAUNCH_CUT') = 0x79FA;
+    rom.addressOf('LAUNCH_RES') = 0x79F6;
+    rom.hasLaunchControl = 1;
+    rom.addressOf('SHIFT_CUT') = 0x7A1B;
+    rom.addressOf('SHIFT_RES') = 0x7A17;
+    rom.hasFullThrottleShift = 1;
+    rom.addressOf('BOOST_CUT') = 0x79E9;
+    rom.hasBoostLimit = 1;
+    refresh ();
+}
+
+function p72_ftl_fts_bcut(){
+    rom.addressOf('LAUNCH_CUT') = 0x68AD;
+    rom.addressOf('LAUNCH_RES') = 0x68A9;
+    rom.hasLaunchControl = 1;
+    rom.addressOf('SHIFT_CUT') = 0x68D0;
+    rom.addressOf('SHIFT_RES') = 0x68CC;
+    rom.hasFullThrottleShift = 1;
+    rom.addressOf('BOOST_CUT') = 0x689C;
+    rom.hasBoostLimit = 1;
+    refresh ();
+}
+
+/////////////////////////////////////////////////////////////////////
+/*******************************************************************/
+
+
+function p28_ShiftLt () {
+    //rom.addressOf('SHIFT_LIGHT') = 0x####;
+    //rom.hasShiftLight = 1;
+    //refresh ();
+}
+
+
+function p30_ShiftLt() {
+    rom.addressOf('SHIFT_LIGHT') = 0x7A4A;
+    rom.hasShiftLight = 1;
+    refresh ();
+}
+
+function p72_ShiftLt () {
+    rom.addressOf('SHIFT_LIGHT') = 0x68FF;
+    rom.hasShiftLight = 1;
+    refresh ();
+}
+
+/////////////////////////////////////////////////////////////////////
+/*******************************************************************/
+
+function __addExtrafeatures() {
+  if ((rom.base == !0) && (rom.base == !1) && (rom.base == !2)) {
+    alert("This plugin only has support for P30, and P72 based ROMs right now.");
+    return;
+  }
+  showBrowser('plugins\\addExtrafeatures\\index.html',520,180);
+}
+function __aboutaddExtrafeatures() {
+  showBrowser('plugins\\addExtrafeatures\\about.html',520,180);
+}
+addRomHandler(rtP28, 'Damian Badalamenti', '_p28_ExtraMods()');
+addRomHandler(rtP30, 'Damian Badalamenti', '_p30_ExtraMods()');
+addRomHandler(rtP72, 'Damian Badalamenti', '_p72_ExtraMods()');
+addPlugin('Damian Badalamenti', 'Add Extra Features', '__addExtrafeatures()', '__aboutaddExtrafeatures()', 1);

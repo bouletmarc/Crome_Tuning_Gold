@@ -1,0 +1,406 @@
+<html>
+<head>
+<title>P13 Options Page</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body, td, th {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #FFFFFF;
+}
+body {
+	background-color: #000000;
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+}
+-->
+</style>
+<link href="master.css" rel="stylesheet" type="text/css">
+<script language="javascript">
+<!--
+//**********************************************************
+var crome = window.external;
+var rom = crome.rom;
+//**********************************************************
+function loadDefaults () {
+	Optionfrm.txtHiRevCut.value =    _word_to_rpm(rom.wordAt(rom.addressOf('REVCUT1')));
+  	Optionfrm.txtHiRevRes.value =    _word_to_rpm(rom.wordAt(rom.addressOf('REVRES1')));
+	Optionfrm.txtUnknwnRevCut.value =    _word_to_rpm(rom.wordAt(0x0C26));
+  	Optionfrm.txtUnknwnRevRes.value =    _word_to_rpm(rom.wordAt(0x0C21));
+  	Optionfrm.txtLoRevCut.value =    _word_to_rpm(rom.wordAt(rom.addressOf('REVCUT2')));
+  	Optionfrm.txtLoRevRes.value =    _word_to_rpm(rom.wordAt(rom.addressOf('REVRES2')));
+   	Optionfrm.txtTargetIdle1.value = _word_to_rpm(rom.wordAt(0x1474));
+  	Optionfrm.txtTargetIdle2.value = _word_to_rpm(rom.wordAt(0x1487));
+  	Optionfrm.txtHiVtecOn.value =    _byte_to_rpm(rom.byteAt(0x35A2));
+  	Optionfrm.txtHiVtecOff.value =   _byte_to_rpm(rom.byteAt(0x359D));
+  	Optionfrm.txtLoVtecOn.value =    _byte_to_rpm(rom.byteAt(0x35AE));
+  	Optionfrm.txtLoVtecOff.value =   _byte_to_rpm(rom.byteAt(0x35A9));
+  	Optionfrm.txtIABOn.value =       _byte_to_rpm(rom.byteAt(0x1B9B));
+  	Optionfrm.txtIABOff.value =      _byte_to_rpm(rom.byteAt(0x1B96));
+  	Optionfrm.txtSpdLimit.value =    rom.byteAt(rom.addressOf('SPEED_LIMIT'));
+        if(rom.byteAt(rom.addressOf('SPEED_LIMIT')) < 0xFF){
+          Optionfrm.SpdLimitBox.checked = true;
+          Optionfrm.txtSpdLimit.disabled = false;
+        }else if(rom.byteAt(rom.addressOf('SPEED_LIMIT')) == 0xFF){
+          Optionfrm.SpdLimitBox.checked = false;
+          Optionfrm.txtSpdLimit.disabled = true;
+        }
+        if(rom.byteAt(0x2EAC) == 0x44){
+          Optionfrm.CoolCheckBox.checked = false;
+        }else if(rom.byteAt(0x35CA) == 0xFF){
+          Optionfrm.CoolCheckBox.checked = true;
+        }
+        if(rom.byteAt(0x7FF1) == 0xFF){
+          Optionfrm.DebugBox.checked = false;
+        }else if(rom.byteAt(0x7FF1) == 0x00){
+          Optionfrm.DebugBox.checked = true;
+        }
+}
+//**********************************************************
+//**********************************************************
+//
+//
+function StartIdle1() {
+	window.external.showBrowser('handlers\\P13_Options\\Idle1.html',150,270);
+}
+function StartIdle2() {
+	window.external.showBrowser('handlers\\P13_Options\\Idle2.html',150,270);
+}
+//**********************************************************
+//OPfrm.txtTest.onKeyPress = keyHandler;
+//
+//
+function keyHandler () {
+var
+  key = window.event.keyCode;
+  if ((key < 48) || (key > 57))window.event.keyCode = 0;
+}
+//**********************************************************
+//**********************************************************
+function optionSelect(m) {
+  if (m == 0) {
+    if (Optionfrm.SpdLimitBox.checked == false){
+      Optionfrm.txtSpdLimit.value = 255;
+      Optionfrm.txtSpdLimit.disabled = true;
+    }else if(Optionfrm.SpdLimitBox.checked == true){
+      Optionfrm.txtSpdLimit.value = 180;
+      Optionfrm.txtSpdLimit.disabled = false;
+    }
+  }
+  if (m == 1) {
+    if (Optionfrm.KnockBox.checked == true){
+
+    }else if(Optionfrm.KnockBox.checked == false){
+
+    }
+  }
+  if (m == 2) {
+    if (Optionfrm.ELDBox.checked == true){
+
+    }else if(Optionfrm.ELDBox.checked == false){
+
+    }
+  }
+  if (m == 3) {
+    if (Optionfrm.EGRBox.checked == true){
+
+    }else if(Optionfrm.EGRBox.checked == false){
+
+    }
+  }
+  if (m == 4) {
+    if (Optionfrm.APSBox.checked == true){
+
+    }else if(Optionfrm.APSBox.checked == false){
+
+    }
+  }
+  if (m == 5) {
+    if (Optionfrm.InjTestBox.checked == true){
+
+    }else if(Optionfrm.InjTestBox.checked == false){
+
+    }
+  }
+  if (m == 6) {
+    if (Optionfrm.OxyBox.checked == true){
+
+    }else if(Optionfrm.OxyBox.checked == false){
+
+    }
+  }
+  if (m == 7) {
+    if (Optionfrm.OxyHeatBox.checked == true){
+
+    }else if(Optionfrm.OxyHeatBox.checked == false){
+
+    }
+  }
+  if (m == 8) {
+    if (Optionfrm.SpeedCheckBox.checked == true){
+
+    }else if(Optionfrm.SpeedCheckBox.checked == false){
+
+    }
+  }
+  if (m == 9) {
+    if (Optionfrm.CoolCheckBox.checked == true){
+      rom.byteAt(0x35CA) = 0xFF;
+    }else if(Optionfrm.CoolCheckBox.checked == false){
+      rom.byteAt(0x35CA) = 0x44;
+    }
+  }
+  if (m == 10) {
+    if (Optionfrm.PressCheckBox.checked == true){
+
+    }else if(Optionfrm.PressCheckBox.checked == false){
+
+    }
+  }
+  if (m == 11) {
+    if (Optionfrm.SolCheckBox.checked == true){
+
+    }else if(Optionfrm.SolCheckBox.checked == false){
+
+    }
+  }
+  if (m == 12) {
+    if (Optionfrm.DebugBox.checked == true){
+      rom.byteAt(0x7FF1) = 0x00;
+    }else if(Optionfrm.DebugBox.checked == false){
+      rom.byteAt(0x7FF1) = 0xFF;
+    }
+  }
+}
+//*******************************************************
+// Apply rpm values to rom..
+//
+function Apply() {
+  rom.gup();     // begin group undo
+  rom.wordAt(rom.addressOf('REVCUT1')) = _rpm_to_word(Optionfrm.txtHiRevCut.value);
+  rom.wordAt(rom.addressOf('REVRES1')) = _rpm_to_word(Optionfrm.txtHiRevRes.value);
+  rom.wordAt(0x0C26) = _rpm_to_word(Optionfrm.txtUnknwnRevCut.value);
+  rom.wordAt(0x0C21) = _rpm_to_word(Optionfrm.txtUnknwnRevRes.value);
+  //rom.wordAt(0x0C26) = _rpm_to_word(Optionfrm.txtHiRevCut.value);
+  //rom.wordAt(0x0C21) = _rpm_to_word(Optionfrm.txtHiRevRes.value);
+  rom.wordAt(rom.addressOf('REVCUT2')) = _rpm_to_word(Optionfrm.txtLoRevCut.value);
+  rom.wordAt(rom.addressOf('REVRES2')) = _rpm_to_word(Optionfrm.txtLoRevRes.value);
+  rom.wordAt(0x1474) = _rpm_to_word(Optionfrm.txtTargetIdle1.value);
+  rom.wordAt(0x1487) = _rpm_to_word(Optionfrm.txtTargetIdle2.value);
+  rom.byteAt(0x35A2) = _rpm_to_byte(Optionfrm.txtHiVtecOn.value);
+  rom.byteAt(0x359D) = _rpm_to_byte(Optionfrm.txtHiVtecOff.value);
+  rom.byteAt(0x35AE) = _rpm_to_byte(Optionfrm.txtLoVtecOn.value);
+  rom.byteAt(0x35A9) = _rpm_to_byte(Optionfrm.txtLoVtecOff.value);
+  rom.byteAt(0x1B9B) = _rpm_to_byte(Optionfrm.txtIABOn.value);
+  rom.byteAt(0x1B96) = _rpm_to_byte(Optionfrm.txtIABOff.value);
+  if (Optionfrm.txtSpdLimit.value > 0xFF) {
+     rom.byteAt(rom.addressOf('SPEED_LIMIT')) = 0xFF;
+  }else {
+     rom.byteAt(rom.addressOf('SPEED_LIMIT')) = Optionfrm.txtSpdLimit.value;
+  }
+  rom.gup();     // end group undo
+  window.close();
+}
+//**********************************************************
+// Coversion Formula's
+//*********************************************************
+//************
+// Convert byte RPM
+function _byte_to_rpm(b) {
+  return Math.round((b - 128) * 1875000 / 30000);
+}
+function _rpm_to_byte(r) {
+  return Math.round(r * 30000 / 1875000 + 128);
+}
+//************
+// Convert word RPM
+function _word_to_rpm(w) {
+  return Math.round(1875000 / w);
+}
+function _rpm_to_word(r) {
+  return Math.round(1875000 / r);
+}
+//***********************************************************
+//-->
+</script>
+</head>
+<body scroll="no" onLoad="loadDefaults()">
+<form action="" method="post" name="Optionfrm" id="Optionfrm">
+<table width="100%" border="0">
+    <td width="60%" height="390">
+	 <table>
+	        <tr>
+		 <td width="125">
+		  	<font size="1">High Cam Rev Limiter:</font>
+		 </td>
+		 <td>
+		 	<input name="txtHiRevCut" type="text" class="formObjects" id="txtHiRevCut" size="5" maxlength="4" value="" onKeyPress="keyHandler()">&nbsp;<font size="1">rpm</font>
+                 </td>
+		</tr>
+		<tr>
+		 <td width="125">
+		 	<font size="1">High Cam Rev Resume:</font>
+		 </td>
+		 <td>
+		 	<input name="txtHiRevRes" type="text" class="formObjects" id="txtHiRevRes" size="5" maxlength="4" value="" onKeyPress="keyHandler()">&nbsp;<font size="1">rpm</font>
+		 </td>
+		</tr>
+		<tr>
+		 <td width="125">
+		 	<font size="1">High Cam Rev Limit II:</font>
+		 </td>
+		 <td>
+		 	<input name="txtUnknwnRevCut" type="text" class="formObjects" id="txt??RevCut" size="5" maxlength="4" value="" onKeyPress="keyHandler()">&nbsp;<font size="1">rpm</font>
+		 </td>
+		</tr>
+		<tr>
+		 <td width="125">
+		 	<font size="1">High Cam Rev Resume II:</font>
+		 </td>
+		 <td>
+		 	<input name="txtUnknwnRevRes" type="text" class="formObjects" id="txt??RevRes" size="5" maxlength="4" value="" onKeyPress="keyHandler()">&nbsp;<font size="1">rpm</font>
+		 </td>
+		</tr>
+		<tr>
+		 <td width="125">
+		 	<font size="1">Low Cam Rev Limit:</font>
+		 </td>
+		 <td>
+		 	<input name="txtLoRevCut" type="text" class="formObjects" id="txtLoRevCut" size="5" maxlength="4" value="" onKeyPress="keyHandler()">&nbsp;<font size="1">rpm</font>
+		 </td>
+		</tr>
+		<tr>
+		 <td width="125">
+		 	<font size="1">Low Cam Rev Resume:</font>
+		 </td>
+		 <td>
+		 	<input name="txtLoRevRes" type="text" class="formObjects" id="txtLoRevRes" size="5" maxlength="4" value="" onKeyPress="keyHandler()">&nbsp;<font size="1">rpm</font>
+		 </td>
+		</tr>
+	 </table>
+	 <br>
+	 <table>
+	 	<tr>
+		 <td width="60">
+		  	<font size="1">Target Idle:</font>
+		 </td>
+		 <td>
+		 	<input name="txtTargetIdle1" type="text" class="formObjects" id="txtTargetIdle1" size="5" maxlength="4" value="" onKeyPress="keyHandler()">&nbsp;<font size="1">rpm</font>
+		 </td>
+		 <td>
+		 	<input name="btnStartUp1" type="button" class="formObjects" id="btnStartUp1" value="Start-Up Idle Map I " onClick="StartIdle1()">
+		 </td>
+		</tr>
+		<tr>
+		 <td width="60">
+		  	<font size="1">Target Idle:</font>
+		 </td>
+		 <td>
+		 	<input name="txtTargetIdle2" type="text" class="formObjects" id="txtTargetIdle2" size="5" maxlength="4" value="" onKeyPress="keyHandler()">&nbsp;<font size="1">rpm</font>
+		 </td>
+		 <td>
+		 	<input name="btnStartUp2" type="button" class="formObjects" id="btnStartUp1" value="Start-Up Idle Map II" onClick="StartIdle2()">
+		 </td>
+		</tr>
+	 </table>
+	 <br>
+	 <table>
+	 	<tr>
+		 <td width="125">
+		  	<font size="1">Hi-Load Vtec Engage:</font>
+		 </td>
+		 <td>
+		 	<input name="txtHiVtecOn" type="text" class="formObjects" id="txtHiVtecOn" size="5" maxlength="4" value="" onKeyPress="keyHandler()">&nbsp;<font size="1">rpm</font>
+		 </td>
+		</tr>
+		<tr>
+		 <td width="125">
+		  	<font size="1">Hi-Load Vtec Release:</font>
+		 </td>
+		 <td>
+		 	<input name="txtHiVtecOff" type="text" class="formObjects" id="txtHiVtecOff" size="5" maxlength="4" value="" onKeyPress="keyHandler()">&nbsp;<font size="1">rpm</font>
+		 </td>
+		</tr>
+			<tr>
+		 <td width="125">
+		  	<font size="1">Lo-Load Vtec Engage:</font>
+		 </td>
+		 <td>
+		 	<input name="txtLoVtecOn" type="text" class="formObjects" id="txtLoVtecOn" size="5" maxlength="4" value="" onKeyPress="keyHandler()">&nbsp;<font size="1">rpm</font>
+		 </td>
+		</tr>
+		<tr>
+		 <td width="125">
+		     	<font size="1">Lo-Load Vtec Release:</font>
+		 </td>
+		 <td>
+		 	<input name="txtLoVtecOff" type="text" class="formObjects" id="txtLoVtecOff" size="5" maxlength="4" value="" onKeyPress="keyHandler()">&nbsp;<font size="1">rpm</font>
+		 </td>
+		</tr>
+	 </table>
+	 <br>
+	 <table>
+	 		<tr>
+		 <td width="60">
+		  		<font size="1">IAB on:</font>
+		 </td>
+		 <td>
+		 	<input name="txtIABOn" type="text" class="formObjects" id="txtIABOn" size="5" maxlength="4" value="" onKeyPress="keyHandler()">&nbsp;<font size="1">rpm</font>
+		 </td>
+		</tr>
+		<tr>
+		 <td width="60">
+		  	<font size="1">IAB 0ff:</font>
+		 </td>
+		 <td>
+		 	<input name="txtIABOff" type="text" class="formObjects" id="txtIABOff" size="5" maxlength="4" value="" onKeyPress="keyHandler()">&nbsp;<font size="1">rpm</font>
+		 </td>
+		</tr>
+		<tr>
+		 <td width="125">
+		  	<input name="SpdLimitBox" type="checkbox" value="checkbox" onClick="optionSelect(0)"><font size="1">Speed Limiter:</font>
+		 </td>
+		 <td>
+		 	<input name="txtSpdLimit" type="text" class="formObjects" id="txtSpdLimit" size="5" maxlength="3" value="" onKeyPress="keyHandler()">&nbsp;<font size="1">Kph</font>
+		 </td>
+		</tr>
+	 </table>
+	</td>
+    <td width="40%" height="390" align="top">
+        <input name="KnockBox" type="checkbox" value="checkbox" onClick="optionSelect(1)" disabled><font size="1">Disable knock</font>
+      <br>
+        <input name="ELDBox" type="checkbox" value="checkbox" onClick="optionSelect(2)" disabled><font size="1">Disable ELD</font>
+      <br>
+        <input name="EGRBox" type="checkbox" value="checkbox" onClick="optionSelect(3)" disabled><font size="1">Disable EGR</font>
+      <br>
+        <input name="APSBox" type="checkbox" value="checkbox" onClick="optionSelect(4)" disabled><font size="1">Disable atmospheric pressure sensor</font>
+      <br>
+        <input name="InjTestBox" type="checkbox" value="checkbox" onClick="optionSelect(5)" disabled><font size="1">Disable injector test</font>
+      <br>
+        <input name="OxyBox" type="checkbox" value="checkbox" onClick="optionSelect(6)" disabled><font size="1">Disable oxygen sensor(open loop)</font>
+      <br>
+        <input name="OxyHeatBox" type="checkbox" value="checkbox" onClick="optionSelect(7)" disabled><font size="1">Disable oxygen sensor heater</font>
+      <br>
+        <input name="SpeedCheckBox" type="checkbox" value="checkbox" onClick="optionSelect(8)" disabled><font size="1">Disable VTEC speed check</font>
+      <br>
+        <input name="CoolCheckBox" type="checkbox" value="checkbox" onClick="optionSelect(9)"><font size="1">Disable VTEC coolant temp check</font>
+      <br>
+        <input name="PressCheckBox" type="checkbox" value="checkbox" onClick="optionSelect(10)" disabled><font size="1">Disable VTEC pressure check</font>
+      <br>
+        <input name="SolCheckBox" type="checkbox" value="checkbox" onClick="optionSelect(11)" disabled><font size="1">Disable VTEC solenoid check</font>
+      <br>
+      <br>
+        <input name="DebugBox" type="checkbox" value="checkbox" onClick="optionSelect(12)"><font size="1">Enable debug mode (disable O2 and more)</font>
+    </td>
+</table>
+<table width="100%" border="0">
+  <tr>
+    <td height="35" align="right"><input name="btnCancel" type="button" class="formObjects" id="btnCancel" onClick="window.close()" value="Cancel">&nbsp;<input name="btnApply" type="button" class="formObjects" id="btnApply" value="  Apply  " onClick="Apply()">&nbsp;&nbsp;</td>
+  </tr>
+</table>
+</form>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body, td, th {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #FFFFFF;
+}
+body {
+	background-color: #000000;
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+}-->
+</style>
+<link href="master.css" rel="stylesheet" type="text/css">
+<script language="javascript">
+<!--
+var
+  FnlMultiType = window.external.rom.hasFinalMultiplier,
+  EctEn = 100,
+  O2Corr = 100,
+  PostEn = 100,
+  TpsEn = 100,
+  CrankEn = 100,
+  MainEn = 100,
+  crome = window.external,
+  rom = crome.rom;
+
+  switch (window.external.rom.base) {
+    case 1: // P30
+      kEctEnrichAddress = 0x7AD4;
+    break;
+    case 2: // P72
+      kEctEnrichAddress = 0x714A;
+   }
+
+//////**********************************************************
+
+function loadDefaults () {
+	if (((rom.base == 1) && ((rom.wordAt(0x1274) == 0X7A4D) || (rom.wordAt(0x14D4) == 0X7AA5))) || ((rom.base == 2) && (rom.wordAt(0x1C65) == 0x70C0))) {	
+		Fuelfrm.txtEctEnrich.value = Math.round(window.external.rom.byteAt(kEctEnrichAddress)/128*100);	
+		Fuelfrm.txtO2Corr.value = Math.round(window.external.rom.wordAt(window.external.rom.addressOf('MTX2'))/32768*100);
+		Fuelfrm.txtMainEnrich.value = Math.round(window.external.rom.wordAt(window.external.rom.addressOf('MTX1'))/32768*100);
+		Fuelfrm.txtCrankEnrich.value = Math.round(window.external.rom.wordAt(window.external.rom.addressOf('MTX3'))/32768*100);
+		Fuelfrm.txtTpsEnrich.value = Math.round(window.external.rom.wordAt(window.external.rom.addressOf('MTX4'))/32768*100);
+		Fuelfrm.txtPostEnrich.value = Math.round(window.external.rom.wordAt(window.external.rom.addressOf('MTX5'))/32768*100);
+		}
+	else {
+  		Fuelfrm.txtMainEnrich.value = MainEn;  
+ 		Fuelfrm.txtCrankEnrich.value = CrankEn;
+  		Fuelfrm.txtTpsEnrich.value = TpsEn;
+   		Fuelfrm.txtPostEnrich.value = PostEn;
+ 		Fuelfrm.txtO2Corr.value = O2Corr;
+  		Fuelfrm.txtEctEnrich.value = EctEn;
+  	}	
+ }
+
+//**********************************************************
+//Fuelfrm.txtTest.onKeyPress = keyHandler;
+//
+//
+
+function keyHandler () {
+var
+  key = window.event.keyCode;
+  if ((key < 48) || (key > 57)) window.event.keyCode = 0;
+}
+
+
+function canGoNext() {
+  EctEn = Math.round(Fuelfrm.txtEctEnrich.value * 128/ 100);
+  O2Corr = Math.round(Fuelfrm.txtO2Corr.value * 32768/ 100);
+  PostEn = Math.round(Fuelfrm.txtPostEnrich.value * 32768/ 100);
+  TpsEn =  Math.round((Fuelfrm.txtTpsEnrich.value * 32768)/100);
+  CrankEn = Math.round(Fuelfrm.txtCrankEnrich.value * 32768/ 100);
+  MainEn = Math.round(Fuelfrm.txtMainEnrich.value * 32768 / 100);
+  parent.setNewFuelModifiers(EctEn, O2Corr, PostEn, TpsEn, CrankEn, MainEn);
+  parent.keepFuelModifiers();
+}
+
+function GoCalc() {
+
+
+
+}
+
+
+
+//-->
+</script>
+</head>
+
+<body scroll="no" onLoad="loadDefaults()">
+<blockquote>
+ <form action="" method="post" name="Fuelfrm" id="Fuelfrm">
+  <table width="610"  border="0" cellspacing="" cellpadding="0" align="middle">
+   <tr>
+    <td width="130" align="left">Final Multiplier:</td>
+    <td  width="70" align="left">
+	 <script>
+	        if (FnlMultiType == 1) document.write('<input name="txtMainEnrich" type="text" class="formObjects" id="txtMainEnrich" size="3" maxlength="3" value="' + MainEn + '" onKeyPress="keyHandler()">');
+	        else document.write('<input name="txtMainEnrich" type="text" class="formObjects" id="txtMainEnrich" size="3" maxlength="3" onKeyPress="keyHandler()">');
+         </script>%
+    </td>
+    <td  width="410" align="left">This changes injector duration for the fuel tables. A multiplier of <br>
+    							  100% is stock, so 50% delivers half the amount of fuel.
+    </td>
+   </tr>
+  </table>
+  <br><br>
+  <table width="610"  border="0" cellspacing="" cellpadding="0" align="middle">
+   <tr>
+    <td width="130" align="left">Cranking Fuel Enrichment:</td>
+    <td  width="70" align="left">
+	 <script>
+	   	if (FnlMultiType == 1) document.write('<input name="txtCrankEnrich" type="text" class="formObjects" id="txtCrankEnrich" size="3" maxlength="3" value="' + CrankEn + '" onKeyPress="keyHandler()">');
+	  	else document.write('<input name="txtCrankEnrich" type="text" class="formObjects" id="txtCrankEnrich" size="3" maxlength="3" onKeyPress="keyHandler()">');
+         </script>%
+    </td>
+    <td  width="410" align="left">This adjusts the amount of fuel delivered when starting the engine.<br>
+    	  This value should be equal to the final multiplier.
+    </td>
+   </tr>
+  </table>
+  <br><br>
+  <table width="610"  border="0" cellspacing="0" cellpadding="0" align="middle">
+   <tr>
+    <td width="130" align="left">Throttle Tip-in Enrichment:</td>
+    <td  width="70" align="left">
+	 <script>
+	   	if (FnlMultiType == 1) document.write('<input name="txtTpsEnrich" type="text" class="formObjects" id="txtTpsEnrich" size="3" maxlength="3" value="' + TpsEn + '" onKeyPress="keyHandler()">');
+	  	else document.write('<input name="txtTpsEnrich" type="text" class="formObjects" id="txtTpsEnrich" size="3" maxlength="3" onKeyPress="keyHandler()">');
+         </script>%
+    </td>
+    <td  width="410" align="left">This adjusts the amount of fuel delivered when the throttle is opened <br>
+    							  quickly. This value should be close to the final multiplier value.
+    </td>
+   </tr>
+  </table>
+  <br><br>
+  <table width="610"  border="0" cellspacing="0" cellpadding="0" align="middle">
+   <tr>
+    <td width="130" align="left">Post Start Enrichment:</td>
+    <td  width="70" align="left">
+         <script>
+	   	if (FnlMultiType == 1) document.write('<input name="txtPostEnrich" type="text" class="formObjects" id="txtPostEnrich" size="3" maxlength="3" value="' + PostEn + '" onKeyPress="keyHandler()">');
+	  	else document.write('<input name="txtPostEnrich" type="text" class="formObjects" id="txtPostEnrich" size="3" maxlength="3" onKeyPress="keyHandler()">');
+         </script>%
+    </td>
+    <td  width="410" align="left">This adjusts the amount of extra fuel delivered immediately after the engine<br>
+                                  is started.
+    </td>
+   </tr>
+  </table>
+  <br><br>
+  <table width="610"  border="0" cellspacing="0" cellpadding="0" align="middle">
+   <tr>
+    <td width="130" align="left">Closed Loop Correction:</td>
+    <td  width="70" align="left">
+	 <script>
+	   	if (FnlMultiType == 1) document.write('<input name="txtO2Corr" type="text" class="formObjects" id="txtO2Corr" size="3" maxlength="3" value="' + O2Corr + '" onKeyPress="keyHandler()">');
+	  	else document.write('<input name="txtO2Corr" type="text" class="formObjects" id="txtO2Corr" size="3" maxlength="3" onKeyPress="keyHandler()">');
+         </script>%
+    </td>
+    <td  width="410" align="left">This adjusts the Closed Loop correction value.<font color ="red">*needs testing*</font>
+    </td>
+   </tr>
+  </table>
+  <br><br>
+  <table width="610"  border="0" cellspacing="0" cellpadding="0" align="middle">
+   <tr>
+    <td width="130" align="left">ECT Enrichment:</td>
+    <td  width="70" align="left">
+	 <script>
+	   	if (FnlMultiType == 1) document.write('<input name="txtEctEnrich" type="text" class="formObjects" id="txtEctEnrich" size="3" maxlength="3" value="' + EctEn + '" onKeyPress="keyHandler()">');
+	  	else document.write('<input name="txtEctEnrich" type="text" class="formObjects" id="txtEctEnrich" size="3" maxlength="3" onKeyPress="keyHandler()">');
+         </script>%
+    </td>
+    <td  width="410" align="left">This adjusts the amount of fuel delivered when the water temprature(ECT)<br>
+                                  is below operating temprature.<font color ="red">*needs testing*</font>
+    </td>
+   </tr>
+  </table>
+ </form>
+</blockquote>
+</body>
+</html>

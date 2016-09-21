@@ -1,0 +1,41 @@
+/*********************************************************************
+** CHECKSUM REMOVER II
+** Auth: Damian Badalamenti
+**
+** Desc: This plugin lets you remove the checksum routine from the
+**       ROM. It also has added support for P13 Bins.
+**
+**/
+
+function removeChecksum (romType, alertWhenDone) {
+	if (romType == null) romType = rom.base;
+	switch (romType) {
+		case rtP13:
+		    rom.byteAt(0x0D22) = 0x03;
+		    rom.wordAt(0x0D23) = 0x360D;
+		    _rom_fill(0x0D25, 0x0D35, 0xFF);
+		    break;
+        case rtP28:
+			rom.byteAt(0x2BA9) = 0x03;
+			rom.wordAt(0x2BAA) = 0x2BB6;
+			_rom_fill(0x2BAC, 0x2BB5, 0xFF);
+			break;
+		case rtP30:
+			rom.byteAt(0x285A) = 0x03;
+			rom.wordAt(0x285B) = 0x2867;
+			_rom_fill(0x285D, 0x2866, 0xFF);
+			break;
+		case rtP72:
+			rom.byteAt(0x2A1D) = 0x03;
+			rom.wordAt(0x2A1E) = 0x2A2A;
+			_rom_fill(0x2A20, 0x2A29, 0xFF);
+			break;
+	}
+	if (alertWhenDone != null) alert ('Checksum routine has been removed from the ROM.');
+}
+
+addPlugin('Damian Badalamenti','Remove Checksum Routine','removeChecksum(null, 1)','',1);
+
+
+
+

@@ -1,0 +1,12 @@
+function __StepRetard() {
+  if (rom.base != 1 && rom.base !=2) {
+    alert("This plugin only has support for P30 and P72 ROMs right now.\nP28 is not supported.");
+    return;
+  }
+  showBrowser('plugins\\StepRetard\\index.html',450,380);
+}
+function __aboutStepRetard() {
+  showBrowser('plugins\\StepRetard\\about.html',520,380);
+}
+
+addPlugin('Damian Badalmenti', 'Step Ignition Retard', '__StepRetard()', '__aboutStepRetard()', 1);

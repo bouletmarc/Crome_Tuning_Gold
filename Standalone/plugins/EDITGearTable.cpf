@@ -1,0 +1,87 @@
+/******************************************
+** P72 Gear Correction
+** Athu: Damian Badalamenti
+** 	 damianbadalamenti@msn.com
+** Desc: Edit
+**
+**
+*/
+
+
+function GearCorrection_edit(rt) {
+
+	var G1Ratio, G2Ratio, G3Ratio, G4Ratio;
+        
+        if (rom.base > 2){
+          G1Ratio = rom.byteAt(kG1RatioAddress);
+	  G2Ratio = rom.byteAt(kG2RatioAddress);
+	  G3Ratio = rom.byteAt(kG3RatioAddress);
+	  G4Ratio = rom.byteAt(kG4RatioAddress);
+        }else {
+          G1Ratio = rom.wordAt(kG1RatioAddress);
+	  G2Ratio = rom.wordAt(kG2RatioAddress);
+	  G3Ratio = rom.wordAt(kG3RatioAddress);
+	  G4Ratio = rom.wordAt(kG4RatioAddress);
+        }
+	v = input('Enter the values.','"Gear 1 Threshold","Gear 2 Threshold","Gear 3 Threshold","Gear 4 Threshold"', new Array(G1Ratio, G2Ratio, G3Ratio, G4Ratio));
+	if (v == '') return;
+	v = v.split(',');
+	for (i = 0; i < 3; i++) {
+		if (isNaN(v[i])) {
+			alert ('Field ' + (i + 1) + ' is invalid.');
+			return;
+		}
+	}
+	G1Ratio = v[0];
+	G2Ratio = v[1];
+	G3Ratio = v[2];
+	G4Ratio = v[3];
+	rom.gup();
+	if (rom.base > 2){
+	  rom.byteAt(kG1RatioAddress) = eval('0x' + DecToHex(G1Ratio));
+          rom.byteAt(kG2RatioAddress) = eval('0x' + DecToHex(G2Ratio));
+          rom.byteAt(kG3RatioAddress) = eval('0x' + DecToHex(G3Ratio));
+          rom.byteAt(kG4RatioAddress) = eval('0x' + DecToHex(G4Ratio));
+	}else {
+          rom.wordAt(kG1RatioAddress) = eval('0x00' + DecToHex(G1Ratio));
+          rom.wordAt(kG2RatioAddress) = eval('0x00' + DecToHex(G2Ratio));
+          rom.wordAt(kG3RatioAddress) = eval('0x00' + DecToHex(G3Ratio));
+          rom.wordAt(kG4RatioAddress) = eval('0x00' + DecToHex(G4Ratio));
+        }
+        rom.gup();
+}
+
+function GrCorrection_P28Handler () {
+  kG1RatioAddress = 0x652D;
+  kG2RatioAddress = 0x652F;
+  kG3RatioAddress = 0x6531;
+  kG4RatioAddress = 0x6533;
+}
+
+function GrCorrection_P30Handler () {
+  kG1RatioAddress = 0x6403;
+  kG2RatioAddress = 0x6405;
+  kG3RatioAddress = 0x6407;
+  kG4RatioAddress = 0x6409;
+}
+
+function GrCorrection_P72Handler () {
+  kG1RatioAddress = 0x5998;
+  kG2RatioAddress = 0x599A;
+  kG3RatioAddress = 0x599C;
+  kG4RatioAddress = 0x599E;
+}
+
+function GrCorrection_P13Handler () {
+  kG1RatioAddress = 0x545B;
+  kG2RatioAddress = 0x545C;
+  kG3RatioAddress = 0x545D;
+  kG4RatioAddress = 0x545E;
+}
+
+addRomHandler(rtP28, 'Damian Badalamenti', 'GrCorrection_P28Handler()');
+addRomHandler(rtP30, 'Damian Badalamenti', 'GrCorrection_P30Handler()');
+addRomHandler(rtP72, 'Damian Badalamenti', 'GrCorrection_P72Handler()');
+addRomHandler(rtP13, 'Damian Badalamenti', 'GrCorrection_P13Handler()');
+
+addPlugin('Damian Badalamenti', 'Edit Gear Table', 'GearCorrection_edit()', '', 1);

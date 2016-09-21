@@ -1,0 +1,7 @@
+Crome Tuning - Gold edition
+
+INSTALLATION INSTRUCTIONS :
+1. Install Crome Tuning
+2. Delete original crome.exe file.
+3. Copy crome.exe from CRACK archive to install directory (default C:\Users\**USERNAME**\AppData\Roaming\CROME)
+4. Run crome.exe

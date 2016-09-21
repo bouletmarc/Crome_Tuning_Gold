@@ -1,0 +1,172 @@
+<html>
+<head>
+<title>P13 Options Page</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body, td, th {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #FFFFFF;
+}
+body {
+	background-color: #000000;
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+}
+-->
+</style>
+<link href="master.css" rel="stylesheet" type="text/css">
+<script language="javascript">
+<!--
+//**********************************************************
+
+function loadDefaults () {
+
+        IDLEfrm.txtDeg1.value = _byte_to_ect(window.external.rom.byteAt(0x551D));
+  	IDLEfrm.txtDeg2.value = _byte_to_ect(window.external.rom.byteAt(0x5520));
+  	IDLEfrm.txtDeg3.value = _byte_to_ect(window.external.rom.byteAt(0x5523));
+  	IDLEfrm.txtDeg4.value = _byte_to_ect(window.external.rom.byteAt(0x5526));
+  	IDLEfrm.txtDeg5.value = _byte_to_ect(window.external.rom.byteAt(0x5529));
+  	IDLEfrm.txtDeg6.value = _byte_to_ect(window.external.rom.byteAt(0x552C));
+  	IDLEfrm.txtDeg7.value = _byte_to_ect(window.external.rom.byteAt(0x552F));
+  	IDLEfrm.txtIdleRPM1.value = _word_to_rpm(window.external.rom.wordAt(0x551E));
+  	IDLEfrm.txtIdleRPM2.value = _word_to_rpm(window.external.rom.wordAt(0x5521));
+  	IDLEfrm.txtIdleRPM3.value = _word_to_rpm(window.external.rom.wordAt(0x5524));
+  	IDLEfrm.txtIdleRPM4.value = _word_to_rpm(window.external.rom.wordAt(0x5527));
+  	IDLEfrm.txtIdleRPM5.value = _word_to_rpm(window.external.rom.wordAt(0x552A));
+  	IDLEfrm.txtIdleRPM6.value = _word_to_rpm(window.external.rom.wordAt(0x552D));
+  	IDLEfrm.txtIdleRPM7.value = _word_to_rpm(window.external.rom.wordAt(0x5530));
+}
+//**********************************************************
+//RPMfrm.txtTest.onKeyPress = keyHandler;
+//
+//
+function keyHandler () {
+var
+  key = window.event.keyCode;
+  if ((key < 48) || (key > 57)) window.event.keyCode = 0;
+}
+//**********************************************************
+//**********************************************************
+// Apply chnges to rom..
+//
+function Apply() {
+  window.external.rom.gup();     // begin group undo
+  window.external.rom.byteAt(0x551D) = _ect_to_byte(IDLEfrm.txtDeg1.value);
+  window.external.rom.byteAt(0x5520) = _ect_to_byte(IDLEfrm.txtDeg2.value);
+  window.external.rom.byteAt(0x5523) = _ect_to_byte(IDLEfrm.txtDeg3.value);
+  window.external.rom.byteAt(0x5526) = _ect_to_byte(IDLEfrm.txtDeg4.value);
+  window.external.rom.byteAt(0x5529) = _ect_to_byte(IDLEfrm.txtDeg5.value);
+  window.external.rom.byteAt(0x552C) = _ect_to_byte(IDLEfrm.txtDeg6.value);
+  window.external.rom.byteAt(0x552F) = _ect_to_byte(IDLEfrm.txtDeg7.value);
+  window.external.rom.wordAt(0x551E) = _rpm_to_word(IDLEfrm.txtIdleRPM1.value);
+  window.external.rom.wordAt(0x5521) = _rpm_to_word(IDLEfrm.txtIdleRPM2.value);
+  window.external.rom.wordAt(0x5524) = _rpm_to_word(IDLEfrm.txtIdleRPM3.value);
+  window.external.rom.wordAt(0x5527) = _rpm_to_word(IDLEfrm.txtIdleRPM4.value);
+  window.external.rom.wordAt(0x352A) = _rpm_to_word(IDLEfrm.txtIdleRPM5.value);
+  window.external.rom.wordAt(0x352D) = _rpm_to_word(IDLEfrm.txtIdleRPM6.value);
+  window.external.rom.wordAt(0x3530) = _rpm_to_word(IDLEfrm.txtIdleRPM7.value);
+  window.external.rom.gup();     // end group undo
+  window.close();
+}
+//**********************************************************
+// Conversion formulas!!
+//**********************************************************
+// Convert Temp
+function _byte_to_ect(b) {
+	return Math.round(120 - (0.55*b));
+}
+function _ect_to_byte(v) {
+	return Math.round((120 /0.55) - (v / 0.55));
+}
+//************
+// Convert RPM
+function _word_to_rpm(w) {
+  return Math.round(1875000 / w);
+}
+function _rpm_to_word(r) {
+  return Math.round(1875000 / r);
+}
+//**********************************************************
+//-->
+</script>
+</head>
+<body scroll="no" onLoad="loadDefaults()">
+<form action="" method="post" name="IDLEfrm" id="IDLEfrm">
+<table width="100%" border="0">
+  <tr width="100%">
+  <td align="middle">
+      <font size="1">Degrees C</font>
+  </td>
+  <td align="middle">
+      <font size="1">RPM</font>
+  </td>
+  </tr>
+  <tr width="100%">
+  <td align="middle">
+      <input name="txtDeg1" type="text" class="formObjects" id="txtDeg1" size="5" maxlength="4" value="" onKeyPress="keyHandler()">
+  </td>
+  <td align="middle">
+      <input name="txtIdleRPM1" type="text" class="formObjects" id="txtIdleRPM1" size="5" maxlength="4" value="" onKeyPress="keyHandler()">
+  </td>
+  </tr>
+   <tr width="100%">
+  <td align="middle">
+      <input name="txtDeg2" type="text" class="formObjects" id="txtDeg2" size="5" maxlength="4" value="" onKeyPress="keyHandler()">
+  </td>
+  <td align="middle">
+      <input name="txtIdleRPM2" type="text" class="formObjects" id="txtIdleRPM2" size="5" maxlength="4" value="" onKeyPress="keyHandler()">
+  </td>
+  </tr>
+  <tr width="100%">
+  <td align="middle">
+      <input name="txtDeg3" type="text" class="formObjects" id="txtDeg3" size="5" maxlength="4" value="" onKeyPress="keyHandler()">
+  </td>
+  <td align="middle">
+      <input name="txtIdleRPM3" type="text" class="formObjects" id="txtIdleRPM3" size="5" maxlength="4" value="" onKeyPress="keyHandler()">
+  </td>
+  </tr>
+  <tr width="100%">
+  <td align="middle">
+      <input name="txtDeg4" type="text" class="formObjects" id="txtDeg4" size="5" maxlength="4" value="" onKeyPress="keyHandler()">
+  </td>
+  <td align="middle">
+      <input name="txtIdleRPM4" type="text" class="formObjects" id="txtIdleRPM4" size="5" maxlength="4" value="" onKeyPress="keyHandler()">
+  </td>
+  </tr>
+  <tr width="100%">
+  <td align="middle">
+      <input name="txtDeg5" type="text" class="formObjects" id="txtDeg5" size="5" maxlength="4" value="" onKeyPress="keyHandler()">
+  </td>
+  <td align="middle">
+      <input name="txtIdleRPM5" type="text" class="formObjects" id="txtIdleRPM5" size="5" maxlength="4" value="" onKeyPress="keyHandler()">
+  </td>
+  </tr>
+  <tr width="100%">
+  <td align="middle">
+      <input name="txtDeg6" type="text" class="formObjects" id="txtDeg6" size="5" maxlength="4" value="" onKeyPress="keyHandler()">
+  </td>
+  <td align="middle">
+      <input name="txtIdleRPM6" type="text" class="formObjects" id="txtIdleRPM6" size="5" maxlength="4" value="" onKeyPress="keyHandler()">
+  </td>
+  </tr>
+  <tr width="100%">
+  <td align="middle">
+      <input name="txtDeg7" type="text" class="formObjects" id="txtDeg7" size="5" maxlength="4" value="" onKeyPress="keyHandler()">
+  </td>
+  <td align="middle">
+      <input name="txtIdleRPM7" type="text" class="formObjects" id="txtIdleRPM7" size="5" maxlength="4" value="" onKeyPress="keyHandler()">
+  </td>
+  </tr>
+</table>
+<table width="100%" border="0">
+  <tr>
+    <td height="35" align="middle"><input name="btnCancel" type="button" class="formObjects" id="btnCancel" onClick="window.close()" value="Cancel">&nbsp;<input name="btnApply" type="button" class="formObjects" id="btnApply" value="  Apply  " onClick="Apply()">&nbsp;&nbsp;</td>
+  </tr>
+</table>
+</form>
+</body>
+</html>

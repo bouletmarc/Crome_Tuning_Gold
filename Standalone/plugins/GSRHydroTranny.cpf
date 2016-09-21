@@ -1,0 +1,63 @@
+/******************************************
+** GSR Hydro Tranny Gear Change
+** Athu: Chris Harris (XENOCRON)
+** 	 chrisharris@xenocron.com
+** Desc: Edit Gear Table to GSR Hydro Trans #'s
+**
+**
+*/
+
+
+function GSRHydroTranny_edit(rt) {
+
+	var G1Ratio, G2Ratio, G3Ratio, G4Ratio;
+
+	rom.gup();
+	if (rom.base > 2){
+	  rom.byteAt(kG1RatioAddress) = eval('0x' + DecToHex(70));
+          rom.byteAt(kG2RatioAddress) = eval('0x' + DecToHex(110));
+          rom.byteAt(kG3RatioAddress) = eval('0x' + DecToHex(154));
+          rom.byteAt(kG4RatioAddress) = eval('0x' + DecToHex(196));
+	}else {
+          rom.wordAt(kG1RatioAddress) = eval('0x00' + DecToHex(70));
+          rom.wordAt(kG2RatioAddress) = eval('0x00' + DecToHex(110));
+          rom.wordAt(kG3RatioAddress) = eval('0x00' + DecToHex(154));
+          rom.wordAt(kG4RatioAddress) = eval('0x00' + DecToHex(196));
+        }
+        rom.gup();
+}
+
+function GrCorrection_P28Handler () {
+  kG1RatioAddress = 0x652D;
+  kG2RatioAddress = 0x652F;
+  kG3RatioAddress = 0x6531;
+  kG4RatioAddress = 0x6533;
+}
+
+function GrCorrection_P30Handler () {
+  kG1RatioAddress = 0x6403;
+  kG2RatioAddress = 0x6405;
+  kG3RatioAddress = 0x6407;
+  kG4RatioAddress = 0x6409;
+}
+
+function GrCorrection_P72Handler () {
+  kG1RatioAddress = 0x5998;
+  kG2RatioAddress = 0x599A;
+  kG3RatioAddress = 0x599C;
+  kG4RatioAddress = 0x599E;
+}
+
+function GrCorrection_P13Handler () {
+  kG1RatioAddress = 0x545B;
+  kG2RatioAddress = 0x545C;
+  kG3RatioAddress = 0x545D;
+  kG4RatioAddress = 0x545E;
+}
+
+addRomHandler(rtP28, 'Damian Badalamenti', 'GrCorrection_P28Handler()');
+addRomHandler(rtP30, 'Damian Badalamenti', 'GrCorrection_P30Handler()');
+addRomHandler(rtP72, 'Damian Badalamenti', 'GrCorrection_P72Handler()');
+addRomHandler(rtP13, 'Damian Badalamenti', 'GrCorrection_P13Handler()');
+
+addPlugin('Chris Harris', 'Select GSR Hydro Tranny', 'GSRHydroTranny_edit()', '', 4);

@@ -1,0 +1,276 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Boost Enhancement Utility</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body {
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	background-color: #000000;
+}
+body,td,th {
+	color: #FFFFFF;
+	font-family: Arial, Helvetica, sans-serif;
+}
+-->
+</style>
+<link href="master.css" rel="stylesheet" type="text/css">
+<script src="advBooster.js"></script>
+<script language="javascript">
+<!--
+/**************************************************************
+** ROM Info
+**/
+var
+  crome = window.external;
+	rom = crome.rom;
+  riOrgMapWidth = 0,
+  riNewMapWidth = 0x10,
+  riOrgHiMapHeight = 0,
+  riNewHiMapHeight = 0,
+  riOrgLoMapHeight = 0,
+  riNewLoMapHeight = 0,
+  riOrgBoostType = 0,
+  riNewBoostType = 1,
+  riNewMAPMin = -59,
+  riNewMAPMax = 1782,
+  curPage = 1,
+  riMapScalars = new Array(rom.addressOf('NFO_LOW_TABLE') % 0x0100);
+  //riLoRevScalars = new Array(Math.round(rom.addressOf('NFO_LOW_TABLE') / 0x0100));
+  //riHiRevScalars = new Array(Math.round(rom.addressOf('NFO_HIGH_TABLE') / 0x0100));
+/**************************************************************
+** getMapWidth
+**/
+function getMapWidth() {
+  return rom.addressOf('NFO_LOW_TABLE') % 0x0100;
+}
+
+/**************************************************************
+** getHiMapHeight
+**/
+function getHiMapHeight() {
+  return Math.round(rom.addressOf('NFO_HIGH_TABLE') / 0x0100);
+}
+
+/**************************************************************
+** getLoMapHeight
+**/
+function getLoMapHeight() {
+  return Math.round(rom.addressOf('NFO_LOW_TABLE') / 0x0100);
+}
+
+/**************************************************************
+** getNewBoostType
+**/
+function getNewBoostType() {
+  return riNewBoostType;
+}
+
+function getNewMAPMin() {
+  return riNewMAPMin;
+}
+
+function getNewMAPMax() {
+  return riNewMAPMax;
+}
+
+/**************************************************************
+**
+*/
+function hasAdvBoostToolsPlus () {
+  rt = rom.base;
+	switch (rt) {
+    case 1: // P30
+	return ((rom.wordAt(0x0829) == 0xA3F5) &&
+                (rom.wordAt(0x0A13) == 0xA3F5) &&
+                (rom.wordAt(0x0A17) != 0x6E72) &&
+                (rom.wordAt(0x1277) == 0x78B9) &&
+                (rom.wordAt(0x15A9) == 0xA3C5) &&
+                (rom.wordAt(0x1BA5) == 0x78C9) &&
+                (rom.wordAt(0x140F) == 0x78DF) &&
+                (rom.wordAt(0x1EEF) == 0x78F2));
+    case 2: // P72
+	return ((rom.wordAt(0x0841) == 0xBBF5) &&
+                (rom.wordAt(0x0A9F) == 0xBBF5) &&
+                (rom.wordAt(0x129E) == 0x676C) &&
+		(rom.wordAt(0x1C69) == 0x677C) &&
+		(rom.wordAt(0x14AD) == 0x6792) &&
+		(rom.wordAt(0x16DE) == 0xDFC4) &&
+		(rom.wordAt(0x20FD) == 0x67A5));
+    }
+}
+
+/**************************************************************
+** fillROMValues
+**
+** desc: Initializes variables to current rom values
+**/
+function fillROMValues () {
+  riOrgMapWidth = getMapWidth();
+  riNewMapWidth = 0x10;
+  riOrgHiMapHeight = getHiMapHeight();
+  riOrgLoMapHeight = getLoMapHeight();
+  riOrgBoostType = rom.hasBoost;
+  riNewBoostType = 1;
+  for (i = 0; i < rom.tableWidth(); i++)
+    riMapScalars[i] = rom.mapScalar(0, i);
+  //for (i = 0; i < getHiMapHeight(); i++)
+    //riLoRevScalars[i] = rom.revScalar(0, i);
+  //for (i = 0; i < getLoMapHeight(); i++)
+    //riHiRevScalars[i] = rom.revScalar(1, i);
+}
+/**************************************************************
+** keepROMValues
+**/
+function keepROMValues () {
+  var
+    p = 0;
+
+  if ((riNewBoostType != 3)&& (riNewBoostType == riOrgBoostType) && (riOrgMapWidth == riNewMapWidth) && hasAdvBoostToolsPlus()) {
+    window.close();
+    return;
+  }
+
+  rom.gup();     // begin group undo
+  if (riOrgBoostType == 0 || riNewMapWidth != riOrgMapWidth || !hasAdvBoostToolsPlus())
+	  addBTPToROM(rom.base, riOrgMapWidth ,riNewMapWidth, riOrgLoMapHeight, riOrgHiMapHeight);
+  setNewBoostType(rom.base, riNewBoostType, riNewMAPMin, riNewMAPMax, riNewMapWidth, riOrgLoMapHeight ,riOrgHiMapHeight);
+  crome.reload();
+  p = Math.round((riNewMAPMax - riMapScalars[0x09]) / riBstCol);
+  for (i = 0; i < 0x09 + riBstCol; i++) {
+    if (i < 0x0A)
+      rom.mapScalar(0, i) = riMapScalars[i];
+    else
+      rom.mapScalar(0, i) = (rom.mapScalar(0, i - 1) + p);
+  }
+	rom.mapScalar(0, 0x09 + riBstCol) = riNewMAPMax;
+
+        // get cutoff value
+	p = Math.round((255 / (riNewMAPMax - riNewMAPMin)) * (riMapScalars[0x00] - riNewMAPMin));
+	if (rom.base == 1)rom.byteAt(0x082C) = p;
+	if (rom.base == 2)rom.byteAt(0x0844) = p;
+
+        // get Closed/open loop switch base value
+        p = Math.round((255 / (riNewMAPMax - riNewMAPMin)) * (riMapScalars[0x05] - riNewMAPMin));
+        if (rom.base == 1)rom.byteAt(0x15AC) = p;
+	if (rom.base == 2)rom.byteAt(0x1654) = p;
+  rom.gup();     // end group undo
+  crome.reload();
+  window.close();
+}
+
+/**************************************************************
+** setNewMAP()
+**
+** desc: Called by page2, this sets the new MAP sensor settings
+**       to be used calculating boost MAP scalars
+**/
+function setNewMAP(t, m, x) {
+  riNewBoostType = t;
+  riNewMAPMin    = m;
+  riNewMAPMax    = x;
+}
+
+/**************************************************************
+** setNewMapSize()
+**
+** desc: Called by page3, this sets the new MAP sensor settings
+**       to be used calculating boost MAP scalars
+**/
+function setNewMapSize(s) {
+  switch (s) {
+     case 0: riBstCol = 0x06;
+     break;
+     case 1: riBstCol = 0x08;
+     break;
+     case 2: riBstCol = 0x0A;
+     break;
+     case 3: riBstCol = 0x0C;
+     break;
+     case 4: riBstCol = 0x0E;
+  }
+  riNewMapWidth = 0x0A + riBstCol;
+}
+
+/**************************************************************
+** goNext()
+**
+** desc: Called by btnNext (next button) to check if it is
+**       OK to proceed with the next page
+**/
+function goNext() {
+  if (ifrmMain.canGoNext()) {
+    curPage++;
+    ifrmMain.location = "page" + curPage + ".html";
+    btnBack.disabled = (curPage == 1);
+  }
+}
+/**************************************************************
+** goBack()
+**
+** desc: Called by the btnBack (back button) to go to the
+**       previous page
+**/
+function goBack() {
+  if (curPage > 1) {
+    curPage--;
+    ifrmMain.location = "page" + curPage + ".html";
+    btnBack.disabled = (curPage == 1);
+  }
+}
+
+/**************************************************************
+** getSummary()
+**
+** desc: Called by page3 to retreive a summary of the options
+**       the user selected
+**/
+function getSummary () {
+var
+  s = "";
+  switch (riNewBoostType) {
+    case 1:
+      s = "MAP Sensor: 1.7 Bar stock Honda MAP sensor<br><br>";
+      break;
+    case 2:
+      s = "MAP Sensor: 3 Bar GM MAP sensor<br><br>";
+      break;
+    case 3:
+      s = "MAP Sensor: Custom " + (riNewMAPMax / 1000).toFixed(1) + " Bar<br>"
+      s += "MAP Min: " + riNewMAPMin + " mbar<br>";
+      s += "MAP Max: " + riNewMAPMax + " mbar<br>"
+  }
+      s += + riBstCol + " Boost Columns<br>";
+
+  return s;
+}
+//-->
+</script>
+</head>
+
+<body scroll="no" onLoad="fillROMValues()">
+<table width="550" height="350"  border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td width="178" align="center" valign="middle"><img src="imgs/sidebar.jpg" width="178" height="350"></td>
+    <td align="center" valign="middle"><table width="100%" height="350"  border="0" cellpadding="0" cellspacing="0">
+      <tr>
+        <td height="50" align="right" valign="bottom" class="uLine"><span class="errorMsg"></span> <span class="pageTitle">ADVANCED BOOST TOOLS+</span></td>
+      </tr>
+      <tr>
+        <td height="250" align="center" valign="middle"><iframe src="page1.html" name="ifrmMain" width="370" marginwidth="0" height="240" marginheight="0" align="middle" scrolling="auto" frameborder="0">This is an iframe element. If you see this message then your browser does not support iframes. Please upgrade your browser to IE 5.0 or higher. Thank you.</iframe></td>
+      </tr>
+      <tr>
+        <td height="50" align="right" class="tLine"><input name="btnBack" type="button" class="formObjects" id="btnBack" value="< Back" onClick="goBack()" disabled><input name="btnNext" type="button" class="formObjects" id="btnNext" value="Next >" onClick="goNext()">
+&nbsp;          <input name="btnCancel" type="button" class="formObjects" id="btnCancel" onClick="window.close()" value="Cancel">
+          &nbsp;</td>
+      </tr>
+    </table></td>
+  </tr>
+</table>
+</body>
+</html>

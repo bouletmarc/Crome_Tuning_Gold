@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body,td,th {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #444444;
+}
+body {
+	background-color: #FFFFFF;
+	margin-left: 3px;
+	margin-top: 3px;
+	margin-right: 3px;
+	margin-bottom: 3px;
+}
+-->
+</style>
+<link href="master.css" rel="stylesheet" type="text/css">
+<script language="javascript">
+<!--
+function canGoNext() {
+  return true;
+}
+//-->
+</script>
+</head>
+
+<body scroll="no">
+Thank you for using <em><strong><span title="Individual Throttle Bodies" style="cursor: help">ITB</span> Tools </strong></em>. This CROME plugin allows you too add and edit ITB maps to P30 and related ROMS. This plugin also includes <em><strong>Fuel Tools</strong></em>, an advance fuel control plugin to help compensate for necessary fuel changes that usually happen when adding larger injectors. <br>
+<br> 
+<script>
+if (!parent.hasITBTools())
+	document.write("<span class=\"errorMsg\">&lt; ! &gt; This ROM currently does not support ITBs. Continuing with this wizard will allow you to add ITB support for this ROM. Please click 'Next' to continue. &lt; ! &gt;</span>");
+else if (!parent.hasRevTools())
+	document.write("This ROM already supports ITBs. Continuing with this wizard will allow you to modify sensor types and add <em><strong>Rev Tools</strong></em> to this ROM. Please click 'Next' to continue.");
+else
+	document.write("This ROM already supports ITBs.. Please click 'Next' to modify sensor types or click 'Cancel' to close this window.");
+</script><br>
+</body>
+</html>

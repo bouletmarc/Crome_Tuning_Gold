@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Boost Enhancement Utility</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body {
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	background-color: #FFFFFF;
+}
+body,td,th {
+	color: #444444;
+	font-family: Arial, Helvetica, sans-serif;
+}
+-->
+</style>
+<link href="master.css" rel="stylesheet" type="text/css">
+<script src="itbcode.js"></script>
+<script language="javascript">
+<!--
+/**************************************************************
+** ROM Info
+**/
+var
+  crome = window.external;
+	rom = crome.rom;
+	curPage = 1;
+	RevTools = true;
+	sensortype = 0;
+	tpsmin = 0.47;
+	tpsmax = 4.53;
+
+function getRevTools() {
+  return RevTools;
+}
+function setRevTools(v) {
+  RevTools = v;
+}
+function getSensorType() {
+  return new Array(sensortype, tpsmin, tpsmax);
+}
+function setSensorType(s, n, x) {
+  if (!s) s = 0;
+  if (!n) n = 0.47;
+	if (!x) x = 4.53;
+	
+	sensortype = s;
+	tpsmin = n;
+	tpsmax = x;
+}
+
+/**************************************************************
+** fillROMValues
+**
+** desc: Initializes variables to current rom values
+**/
+function fillROMValues () {
+  //btnNext.disabled = (hasITBTools() && hasRevTools());
+	if (hasITBTools()) {
+	  if (!isStockTPS()) {
+		  sensortype = 1;
+			tpsmin = (getTPScalerVolts()[0]).toFixed(2);
+			tpsmax = (getTPScalerVolts()[1]).toFixed(2);
+		}
+	}
+}
+/**************************************************************
+** keepROMValues
+**/
+function keepROMValues () {
+  rom.gup();
+  if (!hasRevTools() && RevTools) addRevToolsToROM();
+  if (!hasITBTools()) addITBTToROM();
+	if (hasITBTools()) setTPScalerVolts(tpsmin, tpsmax);
+  rom.gup();
+  crome.reload();
+  window.close();
+}
+
+/**************************************************************
+** goNext()
+**
+** desc: Called by btnNext (next button) to check if it is
+**       OK to proceed with the next page
+**/
+function goNext() {
+  if (ifrmMain.canGoNext()) {
+    curPage++;
+    ifrmMain.location = "page" + curPage + ".html";
+    btnBack.disabled = (curPage == 1);
+  }
+}
+/**************************************************************
+** goBack()
+**
+** desc: Called by the btnBack (back button) to go to the
+**       previous page
+**/
+function goBack() {
+  if (curPage > 1) {
+    curPage--;
+    ifrmMain.location = "page" + curPage + ".html";
+    btnBack.disabled = (curPage == 1);
+  }
+}
+
+/**************************************************************
+** getSummary()
+**
+** desc: Called by page3 to retreive a summary of the options
+**       the user selected
+**/
+function getSummary () {
+var
+  s = "";
+	if (!hasITBTools())
+	  s += "Install ITB Tools<br>\n";
+	if (sensortype == 0)
+		s += "Stock TPS<br>\n";
+	else
+	  s += "Custom TPS: "+tpsmin+"-"+tpsmax+" volts<br>\n";
+	if (RevTools)
+	  s += "Install Rev Tools<br>\n";
+	return s;
+}
+//-->
+</script>
+</head>
+
+<body scroll="no" onLoad="fillROMValues()">
+<table width="550" height="350"  border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td width="178" align="center" valign="middle"><img src="imgs/sidebar.jpg" width="178" height="350"></td>
+    <td align="center" valign="middle"><table width="100%" height="350"  border="0" cellpadding="0" cellspacing="0">
+      <tr>
+        <td height="50" align="right" valign="bottom" class="uLine"><span class="errorMsg">John Cui's</span> <span class="pageTitle"><span title="Individual Throttle Bodies"  style="cursor: help">ITB</span> Tools </span></td>
+      </tr>
+      <tr>
+        <td height="250" align="center" valign="middle"><iframe src="page1.html" name="ifrmMain" width="370" marginwidth="0" height="240" marginheight="0" align="middle" scrolling="auto" frameborder="0">This is an iframe element. If you see this message then your browser does not support iframes. Please upgrade your browser to IE 5.0 or higher. Thank you.</iframe></td>
+      </tr>
+      <tr>
+        <td height="50" align="right" class="tLine"><input name="btnBack" type="button" class="formObjects" id="btnBack" value="< Back" onClick="goBack()" disabled><input name="btnNext" type="button" class="formObjects" id="btnNext" value="Next >" onClick="goNext()">&nbsp;<input name="btnCancel" type="button" class="formObjects" id="btnCancel" onClick="window.close()" value="Cancel">          &nbsp;</td>
+      </tr>
+    </table></td>
+  </tr>
+</table>
+</body>
+</html>

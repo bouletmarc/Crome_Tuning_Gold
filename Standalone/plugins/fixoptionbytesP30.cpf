@@ -1,0 +1,33 @@
+//
+// P30 Option Byte Hack 1.0
+// This script should make all the options (ELD, Speed limiter, etc.) work properly in Crome.
+// It is a horrible dirty hack.
+//
+function __fixoptionbytesP30() {
+  if (rom.base != rtP30) {
+    alert('This rom is not supported by this plugin.');
+    return;
+  }
+  // Start Group Undo Point
+  rom.gup();
+
+  _rom_fill(0x55C0, 0x55C2, 0x00);
+  _rom_fill(0x55C5, 0x55CA, 0x00);
+  _rom_fill(0x55D3, 0x55D7, 0x00);
+  _rom_fill(0x55DF, 0x55EB, 0x00);
+  _rom_fill(0x5604, 0x5608, 0x00);
+  _rom_fill(0x5610, 0x5612, 0x00);
+  _rom_fill(0x5615, 0x561B, 0x00);
+
+  //
+  // End Group Undo Point
+  rom.gup();
+
+  alert('ROM Options should now work!');
+}
+
+function __aboutfixoptionbytesP30() {
+  alert("P30 Option Byte Hack 1.0 \nby Dave Blundell");
+}
+
+addPlugin('Dave Blundell', 'P30 Option Byte Hack', '__fixoptionbytesP30()', '__aboutfixoptionbytesP30', 1);

@@ -1,0 +1,78 @@
+/******************************************
+** P30/P72 Gear Correction
+** Athu: Damian Badalamenti
+** 	 damianbadalamenti@msn.com
+** Desc: Edit
+**
+**
+*/
+
+
+function GearCorrection_edit() {
+
+	var G0, G1, G2, G3, G4, G5;
+	G0 = Math.round(rom.byteAt(kG0Address)/0x80*1000)/1000;
+        G1 = Math.round(rom.byteAt(kG1Address)/0x80*1000)/1000;
+	G2 = Math.round(rom.byteAt(kG2Address)/0x80*1000)/1000;
+	G3 = Math.round(rom.byteAt(kG3Address)/0x80*1000)/1000;
+	G4 = Math.round(rom.byteAt(kG4Address)/0x80*1000)/1000;
+	G5 = Math.round(rom.byteAt(kG5Address)/0x80*1000)/1000;
+
+	v = input('Enter the values.','"Gear 0","Gear 1","Gear 2","Gear 3","Gear 4","Gear 5"', new Array(G0, G1, G2, G3, G4, G5));
+	if (v == '') return;
+	v = v.split(',');
+	for (i = 0; i < 5; i++) {
+		if (isNaN(v[i])) {
+			alert ('Field ' + (i + 1) + ' is invalid.');
+			return;
+		}
+	}
+	G0 = v[0];
+	G1 = v[1];
+	G2 = v[2];
+	G3 = v[3];
+	G4 = v[4];
+	G5 = v[5];
+
+	rom.gup();
+	G0 = Math.round(G0*128*1000)/1000;
+	G1 = Math.round(G1*128*1000)/1000;
+        G2 = Math.round(G2*128*1000)/1000;
+        G3 = Math.round(G3*128*1000)/1000;
+        G4 = Math.round(G4*128*1000)/1000;
+        G5 = Math.round(G5*128*1000)/1000;
+        rom.byteAt(kG0Address) = eval('0x' + DecToHex(G0));
+	rom.byteAt(kG1Address) = eval('0x' + DecToHex(G1));
+        rom.byteAt(kG2Address) = eval('0x' + DecToHex(G2));
+        rom.byteAt(kG3Address) = eval('0x' + DecToHex(G3));
+        rom.byteAt(kG4Address) = eval('0x' + DecToHex(G4));
+        rom.byteAt(kG5Address) = eval('0x' + DecToHex(G5));
+
+        rom.gup();
+}
+
+function GrCorrection_P30Handler () {
+  kG0Address = 0x6b13;
+  kG1Address = 0x6b14;
+  kG2Address = 0x6b15;
+  kG3Address = 0x6b16;
+  kG4Address = 0x6b17;
+  kG5Address = 0x6b18;
+
+}
+
+
+function GrCorrection_P72Handler () {
+  kG0Address = 0x6016;
+  kG1Address = 0x6017;
+  kG2Address = 0x6018;
+  kG3Address = 0x6019;
+  kG4Address = 0x601A;
+  kG5Address = 0x601B;
+
+}
+
+addRomHandler(rtP30, 'Damian Badalamenti', 'GrCorrection_P30Handler()');
+addRomHandler(rtP72, 'Damian Badalamenti', 'GrCorrection_P72Handler()');
+
+addPlugin('Damian Badalamenti', 'Edit Gear Correction', 'GearCorrection_edit()', '', 1);

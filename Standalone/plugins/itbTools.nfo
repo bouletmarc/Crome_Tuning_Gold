@@ -1,0 +1,22 @@
+
+-* <I <T <B * T O O L S + *-
+
+-* by: John Cui
+
+-*--------------------------------------------------------*-
+
+Thank you for using ITB Tools . This CROME plugin allows
+you too add and edit ITB maps to P30 and related ROMS.
+This plugin also includes Fuel Tools, an advance fuel
+control plugin to help compensate for necessary fuel changes
+that usually happen when adding larger injectors, and an
+option to add Rev Tools, another great plugin that allows
+for extended VTEC maps.
+
+To install ITB Tools, extract the zip file into the 
+'plugins' folder of CROME. Then run CROME and install
+'itbTools.cpf' using the CROME plugin manager.
+
+
+
+Enjoy.

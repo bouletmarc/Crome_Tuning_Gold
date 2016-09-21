@@ -1,0 +1,103 @@
+var __REV_TOOLS__ = true;
+
+// P30 Specific Code ///////////////////////////////////////////////////////////
+function __addRevToolsToP30() {
+  // Copy Current RPM Scale
+  var scalarAddr = rom.addressOf('HIGH_REV_SCALAR');
+      revScalar = new Array();
+  for (i = 0; i < 20; i++) {
+    if (i < 14) revScalar[i] = rom.revScalar(1, i+5);
+    else revScalar[i] = revScalar[i-1] + 500;
+  }
+  // Add Extended RPM
+  rom.byteAt(0x09F3) = 0x03;
+  rom.wordAt(0x09F4) = 0x7904;
+  _rom_fill(0x09F6, 0x0A00, 0xFF);
+  _rom_write(0x7904,
+             new Array(0xF9,0xEC,0x17,0x18,0xB5,0xAC,0x4A,0x44,
+                       0x98,0x00,0xAA,0x90,0x37,0x53,0x79,0x43,
+                       0xCE,0x08,0x53,0x78,0xCE,0x06,0x77,0x01,
+                       0xCB,0x02,0x77,0xFF,0x8A,0x60,0x1E,0x70,
+                       0xC3,0x59,0x4B,0x9E,0x12,0x03,0xA1,0x76),
+             0x28);
+  rom.wordat(0x7922) = scalarAddr;
+  var cc = rom.addressOf('NFO_HIGH_TABLE') % 0x0100;
+  //// Rescale Rev Scalars
+  //_rom_write(rom.addressOf('HIGH_REV_SCALAR'),
+  //           new Array(0x3A,0x46,0x52,0x5D,0x69,0x75,0x7A,0x80,0x85,0x8C,0x97,
+  //                     0xA3,0xAF,0xBA,0xC6,0xD1,0xDD,0xE9,0xF4,0x00),
+  //           0x14);
+  // Move Tables
+  for (r = 0; r < 0x13; r++) {
+    if (r < 0x0F) {
+      for (c = 0; c < cc; c++) {
+        rom.byteAt(rom.addressOf('HIGH_FUEL') + (r * cc) + c) = rom.byteAt(rom.addressOf('HIGH_FUEL') + ((r + 5) * cc) + c);
+        rom.byteAt(rom.addressOf('HIGH_IGNITION') + (r * cc) + c) = rom.byteAt(rom.addressOf('HIGH_IGNITION') + ((r + 5) * cc) + c);
+        rom.byteAt(rom.addressOf('HIGH_O2TARGET') + (r * cc) + c) = rom.byteAt(rom.addressOf('HIGH_O2TARGET') + ((r + 5) * cc) + c);
+      }
+    } else {
+      for (c = 0; c < cc; c++) {
+        rom.byteAt(rom.addressOf('HIGH_FUEL') + (r * cc) + c) = rom.byteAt(rom.addressOf('HIGH_FUEL') + (0x13 * cc) + c);
+        rom.byteAt(rom.addressOf('HIGH_IGNITION') + (r * cc) + c) = rom.byteAt(rom.addressOf('HIGH_IGNITION') + (0x13 * cc) + c);
+        rom.byteAt(rom.addressOf('HIGH_O2TARGET') + (r * cc) + c) = rom.byteAt(rom.addressOf('HIGH_O2TARGET') + (0x13 * cc) + c);
+      }
+    }
+  } 
+  __revToolsHandler();
+  for (i = 0; i < 20; i++)
+    rom.revScalar(1,i) = revScalar[i];
+}
+
+// Plugin Check ////////////////////////////////////////////////////////////////
+function __hasRevTools() {
+  switch (rom.base) {
+    case rtP28:
+      break;
+    case rtP30:
+      return (rom.wordAt(0x09F4) == 0x7904);
+    case rtP72:
+      break;
+  }  
+}
+
+// Plugin Handler //////////////////////////////////////////////////////////////
+function __revToolsHandler() {
+  if (!__hasRevTools()) return;
+  switch (rom.base) {
+    case rtP28:
+      break;
+    case rtP30:
+      rom.addressOf('NFO_HIGH_RPM_DIV') = rom.wordAt(0x790D);
+      break;
+    case rtP72:
+      break;
+  }
+}
+
+// Plugin Call /////////////////////////////////////////////////////////////////
+function __revTools(ask) {
+  if (ask == null) ask = false;
+  if (__hasRevTools()) return;  
+  switch (rom.base) {
+    case rtP28:
+      break;
+    case rtP30:
+      if (ask && !confirm("Would you like to install Rev Tools?")) return;
+      rom.gup();
+      __addRevToolsToP30();
+      rom.gup();
+      break;
+    case rtP72:
+      break;
+  }
+  if (ask) reload();
+}
+
+// Plugin Info /////////////////////////////////////////////////////////////////
+function __aboutRevTools() {
+  alert('Rev Tools by John Cui');
+}
+
+// Register Plugins ////////////////////////////////////////////////////////////
+addPlugin('John Cui', 'Rev Tools', '__revTools(true)', '__aboutRevTools()', 1);
+addRomHandler(rtP30, 'John Cui', '__revToolsHandler()');

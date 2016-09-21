@@ -1,0 +1,35 @@
+.pageTitle {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 24px;
+	font-style: italic;
+	font-weight: 900;
+}
+.uLine {
+	border-bottom-width: 3px;
+	border-bottom-style: double;
+	border-bottom-color: #444444;
+}
+.tLine {
+	border-top-width: 1px;
+	border-top-style: solid;
+	border-top-color: #444444;
+}
+.formObjects {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-style: italic;
+	color: #444444;
+	border: 1px solid #444444;
+	background-color: #FFFFFF;
+}
+.errorMsg {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #FF0000;
+}
+.default {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #444444;
+}

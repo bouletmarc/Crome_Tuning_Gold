@@ -1,0 +1,209 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body, td, th {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #FFFFFF;
+}
+body {
+	background-color: #000000;
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+}-->
+</style>
+<link href="master.css" rel="stylesheet" type="text/css">
+<script language="javascript">
+<!--
+var
+  step1 = .08,
+  step2 = .15,
+  step3 = .25,
+  step4 = .5,
+  step5 = .75,
+  psi1 = 0,
+  psi2 = 3,
+  psi3 = 3,
+  psi4 = 5,
+  psi5 = 5,
+  psi6 = 7,
+  psi7 = 7,
+  psi8 = 12,
+  psi9 = 12,
+  psi10 = 30;
+
+//////**********************************************************
+
+function loadDefaults () {
+
+	Retardfrm.txtstep1.value = step1;
+  	Retardfrm.txtstep2.value = step2;
+  	Retardfrm.txtstep3.value = step3;
+  	Retardfrm.txtstep4.value = step4;
+  	Retardfrm.txtstep5.value = step5;
+  	Retardfrm.txtpsi1.value = psi1;
+  	Retardfrm.txtpsi2.value = psi2;
+  	Retardfrm.txtpsi3.value = psi3;
+  	Retardfrm.txtpsi4.value = psi4;
+  	Retardfrm.txtpsi5.value = psi5;
+  	Retardfrm.txtpsi6.value = psi6;
+  	Retardfrm.txtpsi7.value = psi7;
+  	Retardfrm.txtpsi8.value = psi8;
+  	Retardfrm.txtpsi9.value = psi9;
+  	Retardfrm.txtpsi10.value = psi10;
+
+
+
+}
+
+//////**********************************************************
+
+function loadPsiRange (step) {
+	if (step == 1)	Retardfrm.txtpsi3.value = Retardfrm.txtpsi2.value;
+	if (step == 2) 	Retardfrm.txtpsi5.value = Retardfrm.txtpsi4.value;
+  	if (step == 3)  Retardfrm.txtpsi7.value = Retardfrm.txtpsi6.value;
+  	if (step == 4)  Retardfrm.txtpsi9.value = Retardfrm.txtpsi8.value;
+}
+
+
+//**********************************************************
+//Retardfrm.txtTest.onKeyPress = keyHandler;
+//
+//
+
+function keyHandler () {
+var
+  key = window.event.keyCode;
+  if ((key != 46) && (key < 48) || (key > 57)) window.event.keyCode = 0;
+}
+
+
+function canGoNext() {
+
+  step1 = Retardfrm.txtstep1.value;
+  step2 = Retardfrm.txtstep2.value;
+  step3 = Retardfrm.txtstep3.value;
+  step4 = Retardfrm.txtstep4.value;
+  step5 = Retardfrm.txtstep5.value;
+  psi1 = Retardfrm.txtpsi1.value;
+  psi2 = Retardfrm.txtpsi2.value;
+  psi3 = Retardfrm.txtpsi3.value;
+  psi4 = Retardfrm.txtpsi4.value;
+  psi5 = Retardfrm.txtpsi5.value;
+  psi6 = Retardfrm.txtpsi6.value;
+  psi7 = Retardfrm.txtpsi7.value;
+  psi8 = Retardfrm.txtpsi8.value;
+  psi9 = Retardfrm.txtpsi9.value;
+  psi10 = Retardfrm.txtpsi10.value;
+
+  parent.setNewRetardValues(step1, step2, step3, step4, step5, psi1, psi2, psi3, psi4, psi5, psi6, psi7, psi8, psi9, psi10);
+  parent.keepRetardValues();
+}
+
+//-->
+</script>
+</head>
+
+<body scroll="no" onLoad="loadDefaults()">This script will retard boost ignition using a series of steps.<br>
+<blockquote>
+ <form action="" method="post" name="Retardfrm" id="Retardfrm">
+  <table width="315"  border="0" cellspacing="" cellpadding="0" align="middle">
+   <tr>
+    <td width="315" align="left">
+    <script>
+	 	document.write('<input name="txtpsi1" type="text" class="formObjects" id="txtpsi1" size="1" maxlength="2" onKeyPress="keyHandler()"disabled>');
+     </script>
+     Psi&nbsp;to&nbsp;
+     <script>
+	 	document.write('<input name="txtpsi2" type="text" class="formObjects" id="txtpsi2" size="1" maxlength="2" onKeyPress="keyHandler()">');
+     </script>
+     Psi:&nbsp;
+	 <script>
+	 	document.write('<input name="txtstep1" type="text" class="formObjects" id="txtstep1" size="3" maxlength="4" onKeyPress="keyHandler()">');
+     </script>&nbsp; degrees/lb boost
+    </td>
+   </tr>
+  </table>
+  <br>
+  <table width="315"  border="0" cellspacing="" cellpadding="0" align="middle">
+   <tr>
+    <td width="315" align="left">
+    <script>
+	 	document.write('<input name="txtpsi3" type="text" class="formObjects" id="txtpsi3" size="1" maxlength="2" onKeyPress="keyHandler()">');
+     </script>
+     Psi&nbsp;to&nbsp;
+     <script>
+	 	document.write('<input name="txtpsi4" type="text" class="formObjects" id="txtpsi4" size="1" maxlength="2" onKeyPress="keyHandler()">');
+     </script>
+     Psi:&nbsp;
+	 <script>
+	 	document.write('<input name="txtstep2" type="text" class="formObjects" id="txtstep2" size="3" maxlength="4" onKeyPress="keyHandler()">');
+     </script>&nbsp; degrees/lb boost
+    </td>
+   </tr>
+  </table>
+  <br>
+  <table width="315"  border="0" cellspacing="0" cellpadding="0" align="middle">
+   <tr>
+    <td width="315" align="left">
+    <script>
+	 	document.write('<input name="txtpsi5" type="text" class="formObjects" id="txtpsi5" size="1" maxlength="2" onKeyPress="keyHandler()">');
+     </script>
+     Psi&nbsp;to&nbsp;
+     <script>
+	 	document.write('<input name="txtpsi6" type="text" class="formObjects" id="txtpsi6" size="1" maxlength="2" onKeyPress="keyHandler()">');
+     </script>
+     Psi:&nbsp;
+	 <script>
+	   	document.write('<input name="txtstep3" type="text" class="formObjects" id="txtstep3" size="3" maxlength="4" onKeyPress="keyHandler()">');
+     </script>&nbsp; degrees/lb boost
+    </td>
+   </tr>
+  </table>
+  <br>
+  <table width="315"  border="0" cellspacing="0" cellpadding="0" align="middle">
+   <tr>
+    <td width="315" align="left">
+    <script>
+	 	document.write('<input name="txtpsi7" type="text" class="formObjects" id="txtpsi7" size="1" maxlength="2" onKeyPress="keyHandler()">');
+     </script>
+     Psi&nbsp;to&nbsp;
+     <script>
+	 	document.write('<input name="txtpsi8" type="text" class="formObjects" id="txtpsi8" size="1" maxlength="2" onKeyPress="keyHandler()">');
+     </script>
+     Psi:&nbsp;
+	 <script>
+	   	document.write('<input name="txtstep4" type="text" class="formObjects" id="txtstep4" size="3" maxlength="4" onKeyPress="keyHandler()">');
+     </script>&nbsp; degrees/lb boost
+    </td>
+   </tr>
+  </table>
+  <br>
+  <table width="315"  border="0" cellspacing="0" cellpadding="0" align="middle">
+   <tr>
+    <td width="315" align="left">
+    <script>
+	 	document.write('<input name="txtpsi9" type="text" class="formObjects" id="txtpsi9" size="1" maxlength="2" onKeyPress="keyHandler()">');
+     </script>
+     Psi&nbsp;to&nbsp;
+     <script>
+	 	document.write('<input name="txtpsi10" type="text" class="formObjects" id="txtpsi10" size="1" maxlength="2" onKeyPress="keyHandler()">');
+     </script>
+     Psi:&nbsp;
+	 <script>
+	   	document.write('<input name="txtstep5" type="text" class="formObjects" id="txtstep5" size="3" maxlength="4" onKeyPress="keyHandler()">');
+     </script>&nbsp; degrees/lb boost
+    </td>
+   </tr>
+  </table>
+ </form>
+</blockquote>
+</body>
+</html>

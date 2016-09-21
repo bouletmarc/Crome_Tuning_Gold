@@ -1,0 +1,174 @@
+function __itbToolsPlus07P30Handler() {
+// ITB ToolsPlus Handler - enlarged tables
+// For larger tables, etc...
+  if ((rom.wordAt(0x084D) == 0x0000) && //NOPs in MAP sensor routine 0x084d
+      (rom.wordAt(0x1277) == 0x78B9) && //MFC 0x1277
+      (rom.wordAt(0x1BA5) == 0x78C9) && //MFC2 0x1BA5
+      (rom.wordAt(0x140F) == 0x78DF) && //Cranking fuel 0x140F
+      (rom.wordAt(0x1EEF) == 0x78F2) &&	//TPS tip in 0x1EEF
+      (rom.wordAt(0x0890) == 0x6d34)    //Has TPS rescale code at 0x0890
+      )
+  {
+    rom.addressOf('NFO_ITB_XOVER') = rom.wordAt(0x6B1D);
+    rom.hasITB = 1;
+    rom.addressOf('MTX1') = 0x78BB;  // Main Fuel
+    rom.addressOf('MTX2') = 0x78CD;  // O2 Fuel
+    rom.addressOf('MTX3') = 0x78E1;  // Cranking Fuel
+    rom.addressOf('MTX4') = 0x78F4;  // Throttle Tip-in
+    rom.addressOf('MTX5') = 0x0000;
+    rom.addressOf('MTX6') = 0x0000;
+     rom.addressOf('NFO_LOW_TABLE')	  = rom.byteAt(0x0B3A) + (256 * rom.byteAt(0x0B3C))
+     rom.addressOf('NFO_HIGH_TABLE')	  = rom.byteAt(0x0B3A) + (256 * rom.byteAt(0x0B3C))
+     rom.addressOf('LOW_REV_SCALAR')      = rom.wordAt(0x09DC);
+     rom.addressOf('HIGH_REV_SCALAR')     = rom.wordAt(0x7922);
+     rom.addressOf('LOW_FUEL')            = rom.wordAt(0x1257);
+     rom.addressOf('HIGH_FUEL')           = rom.wordAt(0x1245);
+     rom.addressOf('LOW_IGNITION')        = rom.wordAt(0x0B56);
+     rom.addressOf('HIGH_IGNITION')       = rom.wordAt(0x0B4A);
+     rom.addressOf('LOW_O2TARGET')        = rom.wordAt(0x169B);
+     rom.addressOf('HIGH_O2TARGET')       = rom.wordAt(0x1687);
+     rom.addressOf('LOW_MAP_SCALAR')      = rom.wordAt(0x0A17);
+     rom.addressOf('HIGH_MAP_SCALAR')     = rom.wordAt(0x0A2C);
+    rom.hasFinalMultiplier = 1;
+    rom.title = "ITB Tools Plus P30";
+  }
+  // Rev Tools Check
+  if (rom.wordAt(0x09F4) == 0x7904) {
+     rom.addressOf('NFO_HIGH_RPM_DIV') = rom.wordAt(0x790D);
+  }
+}//END PLUS HANDLER
+
+
+//ADD ITB TOOLS TO ROM FUNCTION
+function __itbTools() {
+  if ((rom.base == rtP28) || (rom.base == rtP72)) {
+    alert("This plugin only has support for P30 ROMs right now.");
+    return;
+  } else if (rom.hasBoost > 0) {
+    alert("This plugin cannot be used in conjuction with boost plugins.");
+    return
+  }
+  showBrowser('#SCRIPT_DIR#itbToolsPlusJr01\\about.html',570,380);
+  showBrowser('#SCRIPT_DIR#itbToolsPlusJr01\\index.html',570,380);
+}
+
+function __aboutITBTools() {
+  showBrowser('#SCRIPT_DIR#itbToolsPlusJr01\\about.html',570,380);
+}
+
+//Borrowed from Damian Badalamanti's Advanced Boost Tools+ for inspiration
+//Edits TPS/tps Crossover point
+function __ITBToolsTPS_TPS_XoverEdit() {
+  switch (rom.base) {
+    case rtP30:
+      if ((rom.byteAt(0x082F) == 0xF5) &&
+          (rom.byteAt(0x0830) == 0xB9) &&
+	  (rom.byteAt(0x0831) == 0xC6)) {
+        v = prompt("TPS threshold to switch to TPS maps:", " If the TPS sensor value gets greater than this value, TPS indexing will be used. Crossover TPS %:", _byte_to_tps(rom.byteAt(0x0832)));
+        if (v) {
+         v = parseInt(v);
+         if (v < 0) v = 0;
+         else if (v > 109) v = 109;//Check entry for max... 110%
+         if (rom.byteAt(0x0832) != v) rom.byteAt(0x0832) = _tps_to_byte(v);	//update check in the MAP service routine
+	 if (rom.byteAt(0x6B1D) != v) rom.byteAt(0x6B1D) = _tps_to_byte(v);	//update minimum TPS value in TPS-> MAP conversion routine
+	 window.reload();
+        }
+      }else
+           alert("Function unavailable on this ROM.");
+    break;
+    case rtP72:
+      alert("Function unavailable on this ROM.");
+    break;
+  }
+}
+//END __ITBToolsTPS_TPS_XoverEdit()
+
+//Borrowed from Damian Badalamanti's Advanced Boost Tools+ for inspiration
+//Edits MAP/tps Crossover point
+function __ITBToolsMAP_TPS_XoverEdit() {
+  switch (rom.base) {
+    case rtP30:
+      if ((rom.byteAt(0x0835) == 0xF5) &&
+          (rom.byteAt(0x0836) == 0xA3) &&
+	  (rom.byteAt(0x0837) == 0xC6)) {
+        v = prompt("MAP threshold to switch to TPS maps:", " If the MAP sensor value gets greater than this value, TPS indexing will be used. Crossover point(mbar)", _byte_to_mbar(rom.byteAt(0x0838)));
+        if (v) {
+         v = parseInt(v);
+         if (v < 0) v = 0;
+         else if (v > 1800) v = 1800;//Check entry for max...
+         if (rom.byteAt(0x0838) != v) rom.byteAt(0x0838) = _mbar_to_byte(v);	//update check in MAP service routine
+	 if (rom.byteAt(0x6B1E) != v) rom.byteAt(0x6B1E) = _mbar_to_byte(v);	//update maximum MAP value in TPS-> MAP conversion routine
+	 window.reload();
+        }
+      }else
+           alert("Function unavailable on this ROM.");
+    break;
+    case rtP72:
+      alert("Function unavailable on this ROM.");
+    break;
+  }
+}
+//end __ITBToolsTPS_TPS_XoverEdit()
+
+//Borrowed from Damian Badalamanti's Advanced Boost Tools+ for inspiration
+//Edits MAP point for injector cutoff
+function __ITBToolsMAP_CutoffEdit() {
+  switch (rom.base) {
+    case rtP30:
+      if ((rom.byteAt(0x0839) == 0xCD) && //CMPB A
+          (rom.byteAt(0x083A) == 0x09) && //next two bytes check to see we have L A, 0A3h
+	  (rom.byteAt(0x083B) == 0xC6)) {
+        v = prompt("MAP threshold for injector cut:", " If MAP value drops below this point, injectors will be cut completely.  Used in deceleration.  Cutoff point(millibar)", _byte_to_mbar(rom.byteAt(0x083C)));
+        if (v) {
+         v = parseInt(v);
+         if (v < 0) v = 0;
+         else if (v > 1800) v = 1800;//Check entry for max...
+         if (rom.byteAt(0x083C) != v) rom.byteAt(0x083C) = _mbar_to_byte(v);
+	 window.reload();
+        }
+      }else
+           alert("Function unavailable on this ROM.");
+    break;
+    case rtP72:
+      alert("Function unavailable on this ROM.");
+    break;
+  }
+}
+//end __ITBToolsMAP_CutoffEdit()
+
+//Borrowed from Damian Badalamanti's Advanced Boost Tools+
+// Rev Tools Plugin Check /////////////////////////////////////////////////////
+function hasRevTools() {
+  switch (rom.base) {
+    case 0:
+      break;
+    case 1:
+      return (rom.wordAt(0x09F4) == 0x7904);
+    case 2:
+      break;
+  }
+}
+
+//hacked up to reflect stock MAP sensor...  for now.
+function _byte_to_mbar(v) {
+   return Math.round((v * 7.22100) - 59);
+}
+
+function _mbar_to_byte(v) {
+   return Math.round((v + 59) / 7.22100);
+}
+
+//I guessed on these conversion formulas.  Someone should look them over.
+function _byte_to_tps(v) {
+   return Math.round((v-24) / 2.07);
+}
+
+function _tps_to_byte(v) {
+   return Math.round(24 + (2.07 * v));
+}
+
+addRomHandler(rtP30, 'John Cui and Dave Blundell', '__itbToolsPlus07P30Handler()');
+addPlugin('John Cui and Dave Blundell', 'ITB Tools Plus Jr 0.1', '__itbTools()', '__aboutITBTools()', 0);
+addPlugin('John Cui and Dave Blundell','ITB Tools Plus: MAP-TPS Crossover Edit', '__ITBToolsMAP_TPS_XoverEdit()','__aboutITBTools()', 3);
+addPlugin('John Cui and Dave Blundell','ITB Tools Plus: TPS-TPS Crossover Edit', '__ITBToolsTPS_TPS_XoverEdit()','__aboutITBTools()', 3);
+addPlugin('John Cui and Dave Blundell','ITB Tools Plus: MAP Injector Cut Edit', '__ITBToolsMAP_CutoffEdit()','__aboutITBTools()', 3);

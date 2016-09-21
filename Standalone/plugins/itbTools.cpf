@@ -1,0 +1,43 @@
+function __itbToolsP30Handler() {
+  // ITB Tools Check
+  if ((rom.wordAt(0x084D) == 0x0000) &&
+      (rom.wordAt(0x1277) == 0x78B9) &&
+      (rom.wordAt(0x1BA5) == 0x78C9) &&
+      (rom.wordAt(0x140F) == 0x78DF) &&
+      (rom.wordAt(0x1EEF) == 0x78F2)) {
+      
+    rom.addressOf('NFO_ITB_XOVER') = rom.wordAt(0x6FFE);
+    rom.hasITB = 1;
+    rom.addressOf('MTX1') = 0x78BB;  // Main Fuel
+    rom.addressOf('MTX2') = 0x78CD;  // O2 Fuel
+    rom.addressOf('MTX3') = 0x78E1;  // Cranking Fuel
+    rom.addressOf('MTX4') = 0x78F4;  // Throttle Tip-in
+    rom.addressOf('MTX5') = 0x0000;
+    rom.addressOf('MTX6') = 0x0000;
+    rom.hasFinalMultiplier = 1;
+    rom.title = "ITB Tools P30";  
+  }
+  // Rev Tools Check
+  if (rom.wordAt(0x09F4) == 0x7904) {
+     rom.addressOf('NFO_HIGH_RPM_DIV') = rom.wordAt(0x790D);  
+  }
+}
+
+function __itbTools() {
+  if ((rom.base == rtP28) || (rom.base == rtP72)) {
+    alert("This plugin only has support for P30 ROMs rigt now.");
+    return; 
+  } else if (rom.hasBoost > 0) {
+    alert("This plugin cannot be used in conjuction with boost plugins.");
+    return
+  }
+  showBrowser('#SCRIPT_DIR#itbTools\\about.html',570,380);
+  showBrowser('#SCRIPT_DIR#itbTools\\index.html',570,380);
+}
+
+function __aboutITBTools() {
+  showBrowser('#SCRIPT_DIR#itbTools\\about.html',570,380);
+}
+
+addRomHandler(rtP30, 'John Cui', '__itbToolsP30Handler()');
+addPlugin('John Cui', 'ITB Tools', '__itbTools()', '__aboutITBTools()', 0);

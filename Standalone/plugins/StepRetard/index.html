@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Step Retard Utility</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body {
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	background-color: #000000;
+}
+body, td, th {
+	color: #FFFFFF;
+	font-family: Arial, Helvetica, sans-serif;
+}
+-->
+</style>
+<link href="master.css" rel="stylesheet" type="text/css">
+<script src="StepRetard.js"></script>
+<script language="javascript">
+<!--
+var
+	curPage = 1,
+	ristep1 = 0,
+  	ristep2 = 0,
+  	ristep3 = 0,
+  	ristep4 = 0,
+  	ristep5 = 0;
+
+/**************************************************************
+** keepRetardValues()
+**
+** desc: Called by page 1, sends the retard values
+**       to the stepRetard() function.
+**/
+function keepRetardValues() {
+  window.external.rom.gup();     // begin group undo
+  stepRetard(ristep1, ristep2, ristep3, ristep4, ristep5, ripsi1, ripsi2, ripsi3, ripsi4, ripsi5, ripsi6, ripsi7, ripsi8, ripsi9, ripsi10);
+  window.external.rom.gup();     // end group undo
+  window.external.reload();
+  window.close();
+}
+
+/**************************************************************
+** setNewRetardValues()
+**
+** desc: Called by page 1, sets the retard value settings
+**       selected by the user.
+**/
+function setNewRetardValues(s1, s2, s3, s4, s5, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10) {
+  ristep1 = s1;
+  ristep2 = s2;
+  ristep3 = s3;
+  ristep4 = s4;
+  ristep5 = s5;
+  ripsi1 = p1;
+  ripsi2 = p2;
+  ripsi3 = p3;
+  ripsi4 = p4;
+  ripsi5 = p5;
+  ripsi6 = p6;
+  ripsi7 = p7;
+  ripsi8 = p8;
+  ripsi9 = p9;
+  ripsi10 = p10;
+
+}
+
+/**************************************************************
+** goNext()
+**
+** desc: Called by btnNext (next button) to check if it is
+**       OK to proceed with the next page
+**/
+function goNext() {
+  if (ifrmMain.canGoNext()) {
+    curPage++;
+    ifrmMain.location = "page" + curPage + ".html";
+    btnBack.disabled = (curPage == 1);
+  }
+}
+/**************************************************************
+** goBack()
+**
+** desc: Called by the btnBack (back button) to go to the
+**       previous page
+**/
+function goBack() {
+  if (curPage > 1) {
+    curPage--;
+    ifrmMain.location = "page" + curPage + ".html";
+    btnBack.disabled = (curPage == 1);
+  }
+}
+
+//-->
+</script>
+</head>
+
+<body scroll="no">
+<table width="440" height="350"  border="0" cellpadding="0" cellspacing="0">
+ <tr>
+  <td width="125" align="center" valign="middle"><img src="imgs/Sparkplug.gif" width="100" height="200"></td>
+  <td align="center" valign="middle">
+   <table width="100%" height="350"  border="0" cellpadding="0" cellspacing="0">
+    <tr>
+  <td height="50" align="left" valign="bottom"> <span class="pageTitle">STEP RETARD IGNITION</span></td>
+ </tr>
+  <tr>
+  <td align="right" width="300"><iframe src="page1.html" name="ifrmMain" width="300" marginwidth="0" height="225" marginheight="0" align="right" scrolling="auto" frameborder="0">
+  This is an iframe element. If you see this message then your browser does not support iframes. Please upgrade your browser to IE 5.0 or higher. Thank you.</iframe></td>
+ </tr>
+ <tr>
+  <td height="50" align="right"><input name="btnBack" type="button" class="formObjects" id="btnBack" value="< Back" onClick="goBack()" disabled><input name="btnNext" type="button" class="formObjects" id="btnNext" value="Next >" onClick="goNext()">
+  &nbsp;<input name="btnCancel" type="button" class="formObjects" id="btnCancel" onClick="window.close()" value="Cancel">&nbsp;</td>
+ </tr>
+</table>
+</body>
+</html>

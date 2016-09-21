@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body,td,th {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #FFFFFF;
+}
+body {
+	background-color: #000000;
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+}
+-->
+</style>
+<link href="master.css" rel="stylesheet" type="text/css">
+<script language="javascript">
+<!--
+var
+	mapType = parent.getNewBoostType() - 1;
+  mapMinA = new Array(-59,-49,8,70,-431,100,11.1,-29.9,100,11.1,34.7,-246,-329,3,-7,0);
+  mapMaxA = new Array(1782,2975,2041,2590,3844,2590,3155.7,1799.6,2590,3040,4000,2252,3008,2944,2944,2944);
+	mapMin = parent.getNewMAPMin();
+	mapMax = parent.getNewMAPMax();
+	if (mapType < 2) {
+	  mapMin = mapMinA[mapType];
+		mapMax = mapMaxA[mapType];
+	}
+
+function loadDefaults () {
+  if (!mapType) mapType = 0;
+  if (mapType > 1) mapType = 16;
+	frmMAP.selMAP.selectedIndex = mapType;
+	mapSelect(mapType);
+  frmMAP.txtMinMAP.value = mapMin;
+  frmMAP.txtMaxMAP.value = mapMax;
+	frmMAP.txtKoeovMAP.value = mapKoeov(mapMin, mapMax).toFixed(2);
+}
+
+function mapKoeov(mMin, mMax) {
+  var v = 5 / (mMax - mMin);
+	var m = (1013 - mMin);
+	return (v * m);
+}
+
+function mapSelect(m) {
+  mapType = Math.round(m);
+  if (mapType == 16) {
+    //alert('enable');
+    frmMAP.txtMinMAP.disabled = false;
+    frmMAP.txtMaxMAP.disabled = false;
+		frmMAP.txtKoeovMAP.value = '';
+		frmMAP.txtMinMAP.focus();
+  } else {
+    //alert('disable');
+    frmMAP.txtMinMAP.disabled = true;
+    frmMAP.txtMaxMAP.disabled = true;
+		frmMAP.txtMinMAP.value = mapMinA[mapType];
+		frmMAP.txtMaxMAP.value = mapMaxA[mapType];
+		frmMAP.txtKoeovMAP.value = mapKoeov(mapMinA[mapType], mapMaxA[mapType]).toFixed(2);
+  }
+}
+
+//frmMAP.txtTest.onKeyPress = keyHandler;
+
+function keyHandler () {
+var
+  key = window.event.keyCode;
+  if (((key < 48) || (key > 57)) && (key != 45)) window.event.keyCode = 0;
+}
+
+function canGoNext() {
+  if (mapType == 16) {
+    mapMin = Math.round(frmMAP.txtMinMAP.value);  // make sure value is read as a number
+    mapMax = Math.round(frmMAP.txtMaxMAP.value);  // and not as a string
+	} else {
+	  mapMin = mapMinA[mapType];
+		mapMax = mapMaxA[mapType];
+	}
+  if (mapType > 1) {
+    if (mapMin >= mapMax) {
+	  alert('The minimum MAP reading cannot be greater than or equal to the maximum.');
+	  return false;
+    } else {
+      parent.setNewMAP(3, mapMin, mapMax);
+      return true;
+    }
+  } else {
+    parent.setNewMAP((mapType+1), mapMin, mapMax);
+    return true;
+  }
+}
+//-->
+</script>
+</head>
+
+<body scroll="no" onLoad="loadDefaults()">
+ <p>Please select the type of MAP (Manifold Absolute Pressure) sensor you would will be using. The stock Honda MAP sensor supports up to 1.7 Bars which is roughly 11psi. Another popular option is to use a GM 3Bar map sensor to allow up to 28psi of boost. You can also chose your MAP sensor from a list of commonly used MAP sensors or if you are using another type of MAP sensor, you can simply select 'custom' and enter a value for minimum and maximum readings.</p>
+ <blockquote>
+   <form action="" method="post" name="frmMAP" id="frmMAP">
+	 <select name="selMAP" class="formObjects" id="selMAP" onChange="mapSelect(this.value)">
+	   <option value="0" selected>1.7 Bar Honda MAP sensor</option>
+	   <option value="1">3 Bar GM MAP Sensor</option>
+       	   <option value="2">2 Bar GM MAP Sensor</option>
+	   <option value="3">2.5 Bar Motorola MAP Sensor</option>
+	   <option value="4">3.5 Bar AEM MAP sensor</option>
+	   <option value="5">2.5 Bar Motorola MAP Sensor(fixed)</option>
+	   <option value="6">3 Bar GM MAP Sensor(Test)</option>
+	   <option value="7">Stock Honda Map Sensr(Test)</option>
+	   <option value="8">Xenocron 2.5 bar</option>
+	   <option value="9">Xenocron 3.0 bar</option>
+	   <option value="10">Xenocron 4.0 bar</option>
+	   <option value="11">Type 12</option>
+	   <option value="12">Type 13</option>
+	   <option value="13">Type 14</option>
+	   <option value="14">Type 15</option>
+	   <option value="15">Type 16</option>
+	   <option value="16">Custom</option>
+	 </select>
+   <br>
+   <br>
+   <table width="200"  border="0" cellspacing="0" cellpadding="0">
+       <tr>
+         <td width="35" align="left">min:&nbsp;</td>
+         <td>
+	<script>
+	  if (mapType == 16) document.write('<input name="txtMinMAP" type="text" class="formObjects" id="txtMinMAP" size="5" maxlength="5" value="' + mapMin + '" onKeyPress="keyHandler()" style="text-align: right">');
+	  else document.write('<input name="txtMinMAP" type="text" class="formObjects" id="txtMinMAP" size="5" maxlength="5" onKeyPress="keyHandler()" style="text-align: right" disabled>');
+    </script>
+         mbar</td>
+       </tr>
+       <tr>
+         <td width="35" align="left">max:&nbsp;</td>
+         <td>
+    <script>
+	  if (mapType == 16) document.write('<input name="txtMaxMAP" type="text" class="formObjects" id="txtMaxMAP" size="5" maxlength="5" value="' + mapMin + '" onKeyPress="keyHandler()" style="text-align: right">');
+	  else document.write('<input name="txtMaxMAP" type="text" class="formObjects" id="txtMaxMAP" size="5" maxlength="5" onKeyPress="keyHandler()" style="text-align: right" disabled>');
+	</script>
+           mbar</td>
+       </tr>
+       <tr>
+         <td align="left"><a title="Key On Engine Off" style="cursor:help">koeov</a>:</td>
+         <td><input name="txtKoeovMAP" type="text" class="formObjects" id="txtKoeovMAP" size="5" maxlength="5" style="text-align: right" disabled>
+         volts</td>
+       </tr>
+     </table>
+   </form>
+   </blockquote>
+</body>
+</html>

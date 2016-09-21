@@ -1,0 +1,121 @@
+function __boostToolsPlusP30Handler () {
+  // BoostTools+ Check
+  if ((rom.wordAt(0x0829) == 0xA3F5) &&
+      (rom.wordAt(0x0A13) == 0xA3F5) &&
+      (rom.wordAt(0x0A17) == 0x6E72) &&
+      (rom.wordAt(0x1277) == 0x78B9) &&
+      (rom.wordAt(0x1BA5) == 0x78C9) &&
+      (rom.wordAt(0x140F) == 0x78DF) &&
+      (rom.wordAt(0x1EEF) == 0x78F2)) {
+
+     rom.hasBoost = 0;
+     rom.addressOf('NFO_LOW_TABLE')       = 0x1410;
+     rom.addressOf('NFO_HIGH_TABLE')      = 0x1410;
+     rom.addressOf('LOW_REV_SCALAR')      = 0x6E82;
+     rom.addressOf('HIGH_REV_SCALAR')     = 0x6E96;
+     rom.addressOf('LOW_FUEL')            = 0x6EAA;
+     rom.addressOf('HIGH_FUEL')           = 0x6FFA;
+     rom.addressOf('LOW_IGNITION')        = 0x714A;
+     rom.addressOf('HIGH_IGNITION')       = 0x728A;
+     rom.addressOf('LOW_O2TARGET')        = 0x73CA;
+     rom.addressOf('HIGH_O2TARGET')       = 0x750A;
+     rom.addressOf('LOW_MAP_SCALAR')      = 0x6E72;
+     rom.addressOf('HIGH_MAP_SCALAR')     = 0x6E72;
+     rom.addressOf('NFO_MAP_MIN')         = rom.wordAt(0x6E6E);
+     rom.addressOf('NFO_MAP_MAX')         = rom.wordAt(0x6E70);
+     switch (rom.byteAt(0x6E6D)) {
+        case 0x01:
+           rom.hasBoost = 1;
+           break;        
+        case 0x02:
+           rom.hasBoost = 2;
+           break;         
+        case 0x03:
+           rom.hasBoost = 3;
+     }
+     // Fuel Multipliers
+     rom.addressOf('MTX1') = 0x78BB;  // Main Fuel
+     rom.addressOf('MTX2') = 0x78CD;  // O2 Fuel
+     rom.addressOf('MTX3') = 0x78E1;  // Cranking Fuel
+     rom.addressOf('MTX4') = 0x78F4;  // Throttle Tip-in
+     rom.addressOf('MTX5') = 0x0000;
+     rom.addressOf('MTX6') = 0x0000;
+     rom.hasFinalMultiplier = 1;
+     rom.title = 'BOOST Tools+ P30';
+  }
+}
+
+// For compatibility reasons
+function __boostToolsP30Handler () {
+  // BoostTools Check
+  if ((rom.wordAt(0x0A13) == 0xA3F5) &&
+      (rom.wordAt(0x0A17) == 0x6E72)) {
+
+     rom.hasBoost = 0;
+     rom.addressOf('NFO_LOW_TABLE')       = 0x1410;
+     rom.addressOf('NFO_HIGH_TABLE')      = 0x1410;
+     rom.addressOf('LOW_REV_SCALAR')      = 0x6E82;
+     rom.addressOf('HIGH_REV_SCALAR')     = 0x6E96;
+     rom.addressOf('LOW_FUEL')            = 0x6EAA;
+     rom.addressOf('HIGH_FUEL')           = 0x6FFA;
+     rom.addressOf('LOW_IGNITION')        = 0x714A;
+     rom.addressOf('HIGH_IGNITION')       = 0x728A;
+     rom.addressOf('LOW_O2TARGET')        = 0x73CA;
+     rom.addressOf('HIGH_O2TARGET')       = 0x750A;
+     rom.addressOf('LOW_MAP_SCALAR')      = 0x6E72;
+     rom.addressOf('HIGH_MAP_SCALAR')     = 0x6E72;
+     rom.addressOf('NFO_MAP_MIN')         = rom.wordAt(0x6E6E);
+     rom.addressOf('NFO_MAP_MAX')         = rom.wordAt(0x6E70);
+     switch (rom.byteAt(0x6E6D)) {
+        case 0x01:
+           rom.hasBoost = 1;
+           break;        
+        case 0x02:
+           rom.hasBoost = 2;
+           break;         
+        case 0x03:
+           rom.hasBoost = 3;
+     }
+     rom.title = 'Boost Tools P30';
+  }
+}
+
+function __boostToolsPlusAdvEdit() {
+  if ((rom.wordAt(0x0829) == 0xA3F5) &&
+      (rom.wordAt(0x0A13) == 0xA3F5) &&
+      (rom.wordAt(0x0A17) == 0x6E72) &&
+      (rom.wordAt(0x1277) == 0x78B9) &&
+      (rom.wordAt(0x1BA5) == 0x78C9) &&
+      (rom.wordAt(0x140F) == 0x78DF) &&
+      (rom.wordAt(0x1EEF) == 0x78F2)) {
+    v = prompt("Boost Tools+ MAP Cutoff Edit", "Enter a value for MAP cutoff threshold", rom.byteAt(0x082C));
+    if (v) {
+      v = parseInt(v);
+      if (v < 0) v = 0
+      else if (v > 0xFF) v = 0xFF;
+      if (rom.byteAt(0x082C) != v) rom.byteAt(0x082C) = v;
+    }
+  } else
+    alert("This ROM does not have 'Boost Tools+' installed. Please install 'Boost Tools+' first.");  
+}
+
+function __boostToolsPlus() {
+  if ((rom.base == 0) || (rom.base == 2)) {
+    alert("This plugin only has support for P30 ROMs right now.\nP72, and HiRes P72 support coming soon.\nP28 support will not be added.");
+    return;
+  }
+  else if (rom.hasITB == 1) {
+    alert("This plugin cannot work in conjunction with boost plugins.");
+    return;
+  }
+  showBrowser('#SCRIPT_DIR#boostTools\\about.html',570,380);
+  showBrowser('#SCRIPT_DIR#boostTools\\index.html',570,380);
+}
+function __aboutBoostToolsPlus() {
+  showBrowser('#SCRIPT_DIR#boostTools\\about.html',570,380);
+}
+
+addRomHandler(rtP30, 'John Cui', '__boostToolsP30Handler()');
+addRomHandler(rtP30, 'John Cui', '__boostToolsPlusP30Handler()');
+addPlugin('John Cui', 'Boost Tools+', '__boostToolsPlus()', '__aboutBoostToolsPlus()', 0);
+addPlugin('John Cui', 'Boost Tools+ MAP Cutoff Edit', '__boostToolsPlusAdvEdit()', '__aboutBoostToolsPlus()', 3);

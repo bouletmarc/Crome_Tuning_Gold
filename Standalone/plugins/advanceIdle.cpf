@@ -1,0 +1,64 @@
+/*******************************************************************************
+** Crome Advance Idle
+** Auth: John Cui
+**
+** Desc: This is a more advanced way of editing idle targets.
+**
+**/
+
+function __advanceIdle () {
+  var iCold, iWarm, iMove;
+  switch (rom.base) {
+    case rtP28:
+      iCold = 0x2FE3;
+      iWarm = 0x300E;
+      iMove = 0x3065;
+      break;
+    case rtP30:
+      iCold = 0x2B5D;
+      iWarm = 0x2B75;
+      iMove = 0x2BAC;
+      break;
+    case rtP72:
+      iCold = 0x2D43;
+      iWarm = 0x2D58;
+      iMove = 0x2D81;
+  }
+  if (iCold) {
+    var cc,cr,wc,wr,rc,rr;
+    cc = (0x1C9C38 / rom.wordAt(iCold+4)).toFixed(0);
+    cr = (0x1C9C38 / rom.wordAt(iCold)).toFixed(0);
+    wc = (0x1C9C38 / rom.wordAt(iWarm+4)).toFixed(0);
+    wr = (0x1C9C38 / rom.wordAt(iWarm)).toFixed(0);
+    rc = (0x1C9C38 / rom.wordAt(iMove+4)).toFixed(0);
+    rr = (0x1C9C38 / rom.wordAt(iMove)).toFixed(0);
+    v = input('Enter values for each target.',
+              '"Cold Idle Cut","Cold Idle Resume","Warm Idle Cut","Warm Idle Resume","Moving Idle Cut","Moving Idle Resume"',
+              new Array(cc,cr,wc,wr,rc,rr));
+    if (v == '') return;
+    v = v.split(',');
+    for (i = 0; i < 6; i++) {
+      if (isNaN(v[i])) {
+        alert('Field ' + (i+1) + ' is invalid.');
+        return;
+      }
+      cc = (0x1C9C38 / v[0]).toFixed(0);
+      cr = (0x1C9C38 / v[1]).toFixed(0);
+      wc = (0x1C9C38 / v[2]).toFixed(0);
+      wr = (0x1C9C38 / v[3]).toFixed(0);
+      rc = (0x1C9C38 / v[4]).toFixed(0);
+      rr = (0x1C9C38 / v[5]).toFixed(0);
+      
+      rom.gup();
+      rom.wordAt(iCold+4) = cc;
+      rom.wordAt(iCold) = cr;
+      rom.wordAt(iWarm+4) = wc;
+      rom.wordAt(iWarm) = wr;
+      rom.wordAt(iMove+4) = rc;
+      rom.wordAt(iMove) = rr;
+      rom.gup();
+    }     
+  }
+}
+
+addPlugin('John Cui','Advance Idle', '__advanceIdle()','',3);

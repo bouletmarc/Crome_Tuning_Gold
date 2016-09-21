@@ -1,0 +1,359 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Fuel Enrichment Utility</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body {
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	background-color: #000000;
+}
+body, td, th {
+	color: #FFFFFF;
+	font-family: Arial, Helvetica, sans-serif;
+}
+-->
+</style>
+<link href="master.css" rel="stylesheet" type="text/css">
+<script src="AddFuelMultipliers.js"></script>
+<script language="javascript">
+<!--
+var
+	curPage = 1,
+	riO2Corr = 0,
+	riEctEn = 0,
+	riPostEn = 0,
+	riTpsEn = 0,
+  	riCrankEn = 0,
+  	riMainEn = 0;
+  	crome = window.external,
+	rom = crome.rom;
+
+        switch (window.external.rom.base) {
+          case 1: // P30
+             kEctEnrichAddress = 0X7AD4;
+          break;
+          case 2: // P72
+             kEctEnrichAddress = 0x714A;
+        }
+function P30_FuelMods () {
+
+    if (hasAdvBoostToolsPlus()) {
+	rom.addressOf('MTX5') = 0X7AD2;
+       kEctEnrichAddress = 0x7AD4;
+       return;
+}
+else if (rom.wordAt(0x1274) == 0X7A4D) {
+	rom.addressOf('MTX1') = 0X7ACA;
+       rom.addressOf('MTX2') = 0X7ACC;
+       rom.addressOf('MTX3') = 0X7ACE; 
+       rom.addressOf('MTX4') = 0X7AD0;
+       rom.addressOf('MTX5') = 0X7AD2;
+       kEctEnrichAddress = 0x7AD4;
+       return;
+	}
+}
+/**************************************************************
+** keep
+**/
+function keepFuelModifiers() {
+  window.external.rom.gup();     // begin group undo
+  if (((rom.base == 1) && (rom.wordAt(0x14D4) != 0X7AA5)) || ((rom.base == 2) && (rom.wordAt(0x1C65) != 0x70C0))) addTpsColdMain(window.external.rom.base);
+  window.external.rom.gup();
+  switch (window.external.rom.base) {
+          case 1: // P30
+             P30_FuelMods();
+          break;
+          case 2: // P72
+             P72_FuelMods();
+        }
+  crome.refresh();
+  window.external.rom.wordAt(window.external.rom.addressOf('MTX1')) = riMainEn;
+  window.external.rom.wordAt(window.external.rom.addressOf('MTX2')) = riO2Corr;
+  window.external.rom.wordAt(window.external.rom.addressOf('MTX3')) = riCrankEn;
+  window.external.rom.wordAt(window.external.rom.addressOf('MTX4')) = riTpsEn;
+  window.external.rom.wordAt(window.external.rom.addressOf('MTX5')) = riPostEn;
+  window.external.rom.byteAt(kEctEnrichAddress) = riEctEn;
+  window.external.rom.gup();     // end group undo
+  crome.refresh();
+  crome.reload();
+  window.close();
+}
+
+function _rom_write(startAt, v, count) {
+	for (c = 0; c < count; c++) {
+	   window.external.rom.byteAt(startAt + c) = v[c];
+	}
+}
+
+function _rom_fill (fromAdr, toAdr, byteFill) {
+	if (byteFill == null) byteFill = 0x00;
+	for (i = fromAdr; i <= toAdr; i++) {
+		window.external.rom.byteAt(i) = byteFill;
+	}
+}
+
+
+function addTpsColdMain(rt){
+  if (rt == null) rt = window.external.rom.base;
+   switch (rt) {
+    case 0: // P28
+      addFuelModsToP28();
+    break;
+    case 1: // P30
+      addFuelModsToP30();
+    break;
+    case 2: // P72
+      addFuelModsToP72();
+   }
+}
+
+function hasAdvBoostToolsPlus () {
+  rt = rom.base;
+	switch (rt) {
+    case 1: // P30
+	return ((rom.wordAt(0x0829) == 0xA3F5) &&
+                (rom.wordAt(0x0A13) == 0xA3F5) &&
+                (rom.wordAt(0x0A17) != 0x6E72) &&
+                (rom.wordAt(0x1277) == 0x78B9) &&
+                (rom.wordAt(0x15A9) == 0xA3C5) &&
+                (rom.wordAt(0x1BA5) == 0x78C9) &&
+                (rom.wordAt(0x140F) == 0x78DF) &&
+                (rom.wordAt(0x1EEF) == 0x78F2));
+    case 2: // P72
+	return ((rom.wordAt(0x0841) == 0xBBF5) &&
+                (rom.wordAt(0x0A9F) == 0xBBF5) &&
+                (rom.wordAt(0x129E) == 0x676C) &&
+		(rom.wordAt(0x1C69) == 0x677C) &&
+		(rom.wordAt(0x14AD) == 0x6792) &&
+		(rom.wordAt(0x16DE) == 0xDFC4) &&
+		(rom.wordAt(0x20FD) == 0x67A5));
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+function addFuelModsTo28(){
+            alert("Can someone write this portion of the script?\nI\'m too lazy to do it.");
+            return;
+}
+///Add Fuel Enrichement Support To a P30////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+function addFuelModsToP30 () {
+			if (!hasAdvBoostToolsPlus()) {
+alert ('l');
+            //MainFuel
+            window.external.rom.wordAt(0x1274) = 0X7A4D;
+			s = new Array(0x32,0x88,0x50,0xE5,0x06,0x44,0x8A,0x90,0x9C,0xCA,0x7A,0x90,
+						0x35,0x33,0x35,0x33,0x01);
+			_rom_write(0X7A4D, s, 0x11);
+			
+			//O2Correction
+            window.external.rom.byteAt(0x1BA0) = 0x03;
+			window.external.rom.wordAt(0x1BA1) = 0X7A5E;
+			window.external.rom.byteAt(0x1BA3) = 0xFF;
+            s = new Array(0x92,0x81,0x92,0xA8,0x45,0x4B,0xE5,0x06,0x44,0x8A,0x90,0x9C,0xCC,0x7A,
+						0x90,0x35,0x33,0x35,0x33,0x47,0x49,0x03,0xA4,0x1B);
+			_rom_write(0X7A5E, s, 0x18);
+						
+			//CrankFuel
+			window.external.rom.byteAt(0x140E) = 0x03;
+			window.external.rom.wordAt(0x140F) = 0X7A76;
+            _rom_fill (0x1411, 0x1412, 0xFF);
+            s = new Array(0xE5,0x06,0x44,0x8A,0x90,0x9C,0xCE,0x7A,0x90,0x35,0x33,0x35,
+                        0x33,0x87,0x3C,0xCD,0x03,0x67,0xFF,0xFF,0x03,0x81,0x76);
+			_rom_write(0X7A76, s, 0x17);
+			            
+			//TpsFuel
+			window.external.rom.byteAt(0x13CA) = 0x03;
+			window.external.rom.wordAt(0x13CB) = 0X7A8D;
+            _rom_fill (0x13CD, 0x13D1, 0xFF);
+            s = new Array(0xE5,0x06,0x44,0x8A,0x90,0x9C,0xD0,0x7A,0x90,0x35,0x33,0x35,
+						0x33,0xD4,0x3A,0xED,0x17,0x03,0x03,0x08,0x15,0x03,0xD2,0x13);
+			_rom_write(0X7A8D, s, 0x18);   
+			//Multiplier Table
+			window.external.rom.wordAt(0X7ACA) = 0x8000; //main
+			window.external.rom.wordAt(0X7ACC) = 0x8000; //o2
+			window.external.rom.wordAt(0X7ACE) = 0x8000; //crank
+			window.external.rom.wordAt(0X7AD0) = 0x8000; //tps		
+			P30_FuelMods();	
+			ECTPost();
+	}
+	else ECTPost()
+}
+
+function ECTPost () {        
+			
+			//PostFuel
+            window.external.rom.byteAt(0x14D3) = 0x03;
+			window.external.rom.wordAt(0x14D4) = 0X7AA5;
+            s = new Array(0x35,0x44,0x8A,0x90,0x9C,0xD2,0x7A,0x90,0x35,0x33,0x35,0x33,
+						0xD4,0x60,0x03,0xD6,0x14);
+			_rom_write(0X7AA5, s, 0x11);
+						
+			//EctFuel
+            window.external.rom.byteAt(0x1C97) = 0x03;
+			window.external.rom.wordAt(0x1C98) = 0X7AB6;
+			window.external.rom.byteAt(0x1C9A) = 0xFF;
+            s = new Array(0x20,0x8A,0x90,0x9D,0xD4,0x7A,0xA2,0x34,0xE5,0x06,0x33,0xF5,
+						0x07,0xD4,0x53,0xF4,0x2C,0x03,0x9B,0x1C);
+			_rom_write(0X7AB6, s, 0x14);
+						
+			//Multiplier Table
+			window.external.rom.wordAt(0X7AD2) = 0x8000; //post
+			window.external.rom.wordAt(0X7AD4) = 0x0080; //ect
+			rom.addressOf('MTX5') = 0X7AD4;
+    	   kEctEnrichAddress = 0x7AD4;
+ 	       rom.hasFinalMultiplier = 1;
+    	  	alert('Fuel multiplier support has been added to the P30 ROM.');
+            window.external.refresh();
+			return;
+}
+///Add Fuel Enrichement Support To a P72////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+function addFuelModsToP72(){
+			
+			window.external.rom.wordAt(0x4987) = 0x714C; //Pointer--> Blank Table
+    		window.external.rom.wordAt(0x297B) = 0x714C; //Pointer--> Blank Table
+    		window.external.rom.wordAt(0x4F3B) = 0x714C; //Pointer--> Blank Table
+    		window.external.rom.wordAt(0x399F) = 0x714C; //Pointer--> Blank Table
+            
+			//MainFuel
+			window.external.rom.byteAt(0x129D) = 0x03;
+            window.external.rom.wordAt(0x129E) = 0x70C0;
+			window.external.rom.byteAt(0x12A0) = 0xFF;
+			
+            s = new Array(0xE5,0x06,0x44,0x8A,0x90,0x9C,0x40,0x71,0x90,0x35,0x33,0x35,
+						0x33,0xD4,0x40,0xF4,0x80,0x03,0xA1,0x12);
+			_rom_write(0x70C0, s, 0x14);
+           
+						
+			//O2Correction
+			window.external.rom.byteAt(0x1C64) = 0x03;
+            window.external.rom.wordAt(0x1C65) = 0x70D4;
+			window.external.rom.byteAt(0x1C67) = 0xFF;
+            s = new Array(0x92,0x81,0x92,0xA8,0x45,0x4B,0x44,0x8A,0x90,0x9C,0x42,0x71,
+						0x90,0x35,0x33,0x35,0x33,0x47,0x49,0x03,0x68,0x1C);
+			_rom_write(0x70D4, s, 0x16);
+			
+			//CrankFuel
+            window.external.rom.byteAt(0x14AC) = 0x03;
+			window.external.rom.wordAt(0x14AD) = 0x70EC;
+            _rom_fill (0x14AF, 0x14B0, 0xFF);
+            s = new Array(0xE5,0x06,0x44,0x8A,0x90,0x9C,0x44,0x71,0x90,0x35,0x33,0x35,
+						0x33,0x87,0x44,0xCD,0x03,0x67,0xFF,0xFF,0x03,0xB3,0x14);
+			_rom_write(0x70EC, s, 0x17);
+			
+			//TpsFuel
+			window.external.rom.byteAt(0x1468) = 0x03;
+			window.external.rom.wordAt(0x1469) = 0x7103;
+			_rom_fill (0x14AF, 0x14B2, 0xFF);
+            s = new Array(0xE5,0x06,0x44,0x8A,0x90,0x9C,0x46,0x71,0x90,0x35,0x33,0x35,
+						0x33,0xD4,0x42,0xED,0x1F,0x03,0x03,0xBD,0x15,0x03,0x70,0x14);
+			_rom_write(0x7103, s, 0x18);
+									
+			//PostFuel
+            window.external.rom.byteAt(0x157F) = 0x03;
+			window.external.rom.wordAt(0x1580) = 0x711B;
+            s = new Array(0x35,0x44,0x8A,0x90,0x9C,0x48,0x71,0x90,0x35,0x33,0x35,0x33,
+						0xD4,0x70,0x03,0x82,0x15);
+			_rom_write(0x711B, s, 0x11);
+			
+			//EctFuel
+            window.external.rom.byteAt(0x1DDA) = 0x03;
+			window.external.rom.wordAt(0x1DDB) = 0x712C;
+            window.external.rom.byteAt(0x1DDD) = 0xFF;
+            s = new Array(0x20,0x8A,0x90,0x9D,0x4A,0x71,0xA2,0x34,0xE5,0x06,0x33,0xF5,
+						0x07,0xD4,0x63,0xF4,0x32,0x03,0xDE,0x1D);
+			_rom_write(0x712C, s, 0x14);
+			
+			//Multiplier Table
+			window.external.rom.wordAt(0x7140) = 0x8000; //main
+			window.external.rom.wordAt(0x7142) = 0x8000; //o2
+			window.external.rom.wordAt(0x7144) = 0x8000; //crank
+			window.external.rom.wordAt(0x7146) = 0x8000; //tps
+			window.external.rom.wordAt(0x7148) = 0x8000; //post
+			window.external.rom.wordAt(0x714A) = 0x0080; //ect
+			alert('Final-Crank-Tps multiplier support has been added the P72 ROM.');
+			window.external.refresh();
+			return;
+}
+////////////////////////////////////////////////////////////////////////////////////////
+/**************************************************************************************/
+
+
+
+
+
+/**************************************************************
+** setNewFuelModifiers()
+**
+** desc: Called by page1, sets the new rpm value settings
+**       selected by the user.
+**/
+function setNewFuelModifiers(Ect, O2, Pst, T, Cr, M) {
+  riEctEn = Ect;
+  riO2Corr = O2;
+  riPostEn = Pst;
+  riTpsEn = T;
+  riCrankEn = Cr;
+  riMainEn = M;
+
+}
+
+/**************************************************************
+** goNext()
+**
+** desc: Called by btnNext (next button) to check if it is
+**       OK to proceed with the next page
+**/
+function goNext() {
+  if (ifrmMain.canGoNext()) {
+    curPage++;
+    ifrmMain.location = "page" + curPage + ".html";
+    btnBack.disabled = (curPage == 1);
+  }
+}
+/**************************************************************
+** goBack()
+**
+** desc: Called by the btnBack (back button) to go to the
+**       previous page
+**/
+function goBack() {
+  if (curPage > 1) {
+    curPage--;
+    ifrmMain.location = "page" + curPage + ".html";
+    btnBack.disabled = (curPage == 1);
+  }
+}
+
+//-->
+</script>
+</head>
+
+<body scroll="no">
+<table width="615" height="450"  border="0" cellpadding="0" cellspacing="0">
+      <tr>
+        <td height="50" align="center" valign="bottom" class="uLine"> <span class="pageTitle">FUEL MULTIPLIERS</span>&nbsp; 
+        ver 1.2</td>
+      </tr>
+      <tr>
+        <td height="350" align="center" valign="middle"><iframe src="page1.html" name="ifrmMain" width="610" marginwidth="0" height="340" marginheight="0" align="middle" scrolling="auto" frameborder="0">
+        This is an iframe element. If you see this message then your browser does not support iframes. Please upgrade your browser to IE 5.0 or higher. Thank you.</iframe></td>
+      </tr>
+      <tr>
+        <td height="50" align="right" class="tLine"><input name="btnBack" type="button" class="formObjects" id="btnBack" value="< Back" onClick="goBack()" disabled><input name="btnNext" type="button" class="formObjects" id="btnNext" value="Next >" onClick="goNext()">
+&nbsp;          <input name="btnCancel" type="button" class="formObjects" id="btnCancel" onClick="window.close()" value="Cancel">
+          &nbsp;</td>
+      </tr>
+    </table></td>
+  </tr>
+</table>
+</body>
+</html>
